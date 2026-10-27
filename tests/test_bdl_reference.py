@@ -1,5 +1,4 @@
 """Deterministic BALLDONTLIE importer tests, no live or billable API calls."""
-import json
 from datetime import date
 
 import httpx
