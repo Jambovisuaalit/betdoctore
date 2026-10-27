@@ -5,7 +5,7 @@
 - Editable package installation: passed on Python 3.12.14.
 - Dependency integrity (`pip check`): passed.
 - Ruff static analysis: passed.
-- Pytest: 23 passed. One upstream Starlette/httpx deprecation warning.
+- Pytest: 24 passed. One upstream Starlette/httpx deprecation warning.
 - SQLite migration upgrade, schema drift check, downgrade and re-upgrade: passed.
 - PostgreSQL offline migration SQL generation: passed; this is not a PostgreSQL execution test.
 - Synthetic CLI end-to-end backtest: passed, HTML/JSON created in `reports/fixture`.
@@ -23,6 +23,11 @@ Fixture metrics are only synthetic software evidence, and are intentionally not 
 historical accuracy or profitability. ROI is null for the default uncalibrated PASS-only fixture.
 
 ## External checks
+
+PostgreSQL CI passed installation, Ruff, migrations, tests and fixture reporting on the original
+platform commit `dec98b5`: https://github.com/Jambovisuaalit/betdoctore/actions/runs/40461128217.
+Subsequent fixes and the Compose build/API smoke check run on the PR's current head; inspect
+those checks for the final runtime result.
 
 Docker and PostgreSQL server binaries are unavailable in this local environment. Live PostgreSQL
 migrations and integration tests are configured in GitHub Actions; inspect the draft PR checks for
