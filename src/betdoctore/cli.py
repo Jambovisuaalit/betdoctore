@@ -186,3 +186,21 @@ def foundation_audit(root: Path = Path("data/results"),
 
     from .season_audit import run_foundation_audit
     typer.echo(str(run_foundation_audit(root, captures, index, date.fromisoformat(as_of), output)))
+
+
+@app.command("regular-season-verify")
+def regular_season_verify(
+    reference_file: Path,
+    provenance_file: Path,
+    root: Path = Path("data/results"),
+    output: Path = Path("data/coverage/approved"),
+    as_of: str = "2026-10-27",
+):
+    """Reconcile an independent licensed event manifest against private local results."""
+    from datetime import date
+
+    from .independent_regular_season import run_regular_season_audit
+    path = run_regular_season_audit(
+        root, reference_file, provenance_file, output, date.fromisoformat(as_of)
+    )
+    typer.echo(str(path))
