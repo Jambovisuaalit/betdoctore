@@ -1,0 +1,685 @@
+{
+  "cup_finals": [
+    {
+      "game_key": "nba:2023-12-09:IND:LAL",
+      "season_end_year": 2024,
+      "source_url": "https://www.nba.com/game/ind-vs-lal-0062300001"
+    },
+    {
+      "game_key": "nba:2024-12-17:MIL:OKC",
+      "season_end_year": 2025,
+      "source_url": "https://www.nba.com/game/mil-vs-okc-0062400001"
+    },
+    {
+      "game_key": "nba:2025-12-16:NYK:SAS",
+      "season_end_year": 2026,
+      "source_url": "https://www.nba.com/game/sas-vs-nyk-0062500001"
+    }
+  ],
+  "evidence_scope": "format and completed playoff series metadata, not historical schedule publication",
+  "regular_format_sources": [
+    "https://www.nba.com/news/nba-announces-structure-and-format-for-2020-21-season",
+    "https://www.nba.com/news/nba-cup-101"
+  ],
+  "reviewed_on": "2026-10-27",
+  "schema_version": 1,
+  "seasons": [
+    {
+      "play_in_expected_games": 6,
+      "playoff_expected_games": 85,
+      "playoff_identity_manifest_verified": false,
+      "playoff_series": [
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2021/east-first-round-1",
+          "team_a": "PHI",
+          "team_b": "WAS"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2021/east-first-round-2",
+          "team_a": "BKN",
+          "team_b": "BOS"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2021/east-first-round-3",
+          "team_a": "MIA",
+          "team_b": "MIL"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2021/east-first-round-4",
+          "team_a": "ATL",
+          "team_b": "NYK"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2021/west-first-round-1",
+          "team_a": "MEM",
+          "team_b": "UTA"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2021/west-first-round-2",
+          "team_a": "LAL",
+          "team_b": "PHX"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2021/west-first-round-3",
+          "team_a": "DEN",
+          "team_b": "POR"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2021/west-first-round-4",
+          "team_a": "DAL",
+          "team_b": "LAC"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2021/east-semifinal-1",
+          "team_a": "ATL",
+          "team_b": "PHI"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2021/east-semifinal-2",
+          "team_a": "BKN",
+          "team_b": "MIL"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2021/west-semifinal-1",
+          "team_a": "LAC",
+          "team_b": "UTA"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2021/west-semifinal-2",
+          "team_a": "DEN",
+          "team_b": "PHX"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2021/west-final",
+          "team_a": "LAC",
+          "team_b": "PHX"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2021/east-final",
+          "team_a": "ATL",
+          "team_b": "MIL"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2021/the-finals",
+          "team_a": "MIL",
+          "team_b": "PHX"
+        }
+      ],
+      "regular_expected_games": 1080,
+      "regular_games_per_team": 72,
+      "season_end_year": 2021,
+      "source_documents": [
+        {
+          "path": "bracket2021-first.md",
+          "representation": "retrieved_markdown",
+          "sha256": "ba051a32d24f65316365a25275cad5078ca796f292dddcf6e8a0274fcbe24a61"
+        },
+        {
+          "path": "bracket2021-semi.md",
+          "representation": "retrieved_markdown",
+          "sha256": "7456d1f16919d7d4b16716cda3fcdccc29d7f6df96f64af9bb87daac4bb6ce5b"
+        },
+        {
+          "path": "bracket2021-conference.md",
+          "representation": "retrieved_markdown",
+          "sha256": "2ffdec647797ddbfda194b9f6acb32bf1527de01ffa08fbc7274fa60461cb947"
+        },
+        {
+          "path": "bracket2021-finals.md",
+          "representation": "retrieved_markdown",
+          "sha256": "f44b4aee14e2be4023b24841482fac8912ee65721992c0c8e33e7800089c0944"
+        }
+      ]
+    },
+    {
+      "play_in_expected_games": 6,
+      "playoff_expected_games": 87,
+      "playoff_identity_manifest_verified": false,
+      "playoff_series": [
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2022/east-first-round-1",
+          "team_a": "ATL",
+          "team_b": "MIA"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2022/east-first-round-4",
+          "team_a": "PHI",
+          "team_b": "TOR"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2022/east-first-round-3",
+          "team_a": "CHI",
+          "team_b": "MIL"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2022/east-first-round-2",
+          "team_a": "BKN",
+          "team_b": "BOS"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2022/east-semifinal-1",
+          "team_a": "MIA",
+          "team_b": "PHI"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2022/east-semifinal-2",
+          "team_a": "BOS",
+          "team_b": "MIL"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2022/east-final",
+          "team_a": "BOS",
+          "team_b": "MIA"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2022/west-first-round-1",
+          "team_a": "NOP",
+          "team_b": "PHX"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2022/west-first-round-4",
+          "team_a": "DAL",
+          "team_b": "UTA"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2022/west-first-round-3",
+          "team_a": "DEN",
+          "team_b": "GSW"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2022/west-first-round-2",
+          "team_a": "MEM",
+          "team_b": "MIN"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2022/west-semifinal-1",
+          "team_a": "DAL",
+          "team_b": "PHX"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2022/west-semifinal-2",
+          "team_a": "GSW",
+          "team_b": "MEM"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2022/west-final",
+          "team_a": "DAL",
+          "team_b": "GSW"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2022/the-finals",
+          "team_a": "BOS",
+          "team_b": "GSW"
+        }
+      ],
+      "regular_expected_games": 1230,
+      "regular_games_per_team": 82,
+      "season_end_year": 2022,
+      "source_documents": [
+        {
+          "path": "bracket2022.md",
+          "representation": "retrieved_markdown",
+          "sha256": "3ea5cfe23ab979d6bd7df7bfea6c435e28cae624c7ccec8d98cbb93215077f55"
+        }
+      ]
+    },
+    {
+      "play_in_expected_games": 6,
+      "playoff_expected_games": 84,
+      "playoff_identity_manifest_verified": false,
+      "playoff_series": [
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2023/east-first-round-1",
+          "team_a": "MIA",
+          "team_b": "MIL"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2023/east-first-round-4",
+          "team_a": "CLE",
+          "team_b": "NYK"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2023/east-first-round-3",
+          "team_a": "BKN",
+          "team_b": "PHI"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2023/east-first-round-2",
+          "team_a": "ATL",
+          "team_b": "BOS"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2023/east-semifinal-1",
+          "team_a": "MIA",
+          "team_b": "NYK"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2023/east-semifinal-2",
+          "team_a": "BOS",
+          "team_b": "PHI"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2023/east-final",
+          "team_a": "BOS",
+          "team_b": "MIA"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2023/west-first-round-1",
+          "team_a": "DEN",
+          "team_b": "MIN"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2023/west-first-round-4",
+          "team_a": "LAC",
+          "team_b": "PHX"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2023/west-first-round-3",
+          "team_a": "GSW",
+          "team_b": "SAC"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2023/west-first-round-2",
+          "team_a": "LAL",
+          "team_b": "MEM"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2023/west-semifinal-1",
+          "team_a": "DEN",
+          "team_b": "PHX"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2023/west-semifinal-2",
+          "team_a": "GSW",
+          "team_b": "LAL"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2023/west-final",
+          "team_a": "DEN",
+          "team_b": "LAL"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2023/the-finals",
+          "team_a": "DEN",
+          "team_b": "MIA"
+        }
+      ],
+      "regular_expected_games": 1230,
+      "regular_games_per_team": 82,
+      "season_end_year": 2023,
+      "source_documents": [
+        {
+          "path": "bracket2023.md",
+          "representation": "retrieved_markdown",
+          "sha256": "c28d11894a642b659feda53e3f26108094383e9ec2a3ab0e7de631d9e1d9708e"
+        }
+      ]
+    },
+    {
+      "play_in_expected_games": 6,
+      "playoff_expected_games": 82,
+      "playoff_identity_manifest_verified": false,
+      "playoff_series": [
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2024/east-first-round-1",
+          "team_a": "BOS",
+          "team_b": "MIA"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2024/east-first-round-4",
+          "team_a": "CLE",
+          "team_b": "ORL"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2024/east-first-round-3",
+          "team_a": "IND",
+          "team_b": "MIL"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2024/east-first-round-2",
+          "team_a": "NYK",
+          "team_b": "PHI"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2024/east-semifinal-1",
+          "team_a": "BOS",
+          "team_b": "CLE"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2024/east-semifinal-2",
+          "team_a": "IND",
+          "team_b": "NYK"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2024/east-final",
+          "team_a": "BOS",
+          "team_b": "IND"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2024/west-first-round-1",
+          "team_a": "NOP",
+          "team_b": "OKC"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2024/west-first-round-4",
+          "team_a": "DAL",
+          "team_b": "LAC"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2024/west-first-round-3",
+          "team_a": "MIN",
+          "team_b": "PHX"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2024/west-first-round-2",
+          "team_a": "DEN",
+          "team_b": "LAL"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2024/west-semifinal-1",
+          "team_a": "DAL",
+          "team_b": "OKC"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2024/west-semifinal-2",
+          "team_a": "DEN",
+          "team_b": "MIN"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2024/west-final",
+          "team_a": "DAL",
+          "team_b": "MIN"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2024/nba-finals",
+          "team_a": "BOS",
+          "team_b": "DAL"
+        }
+      ],
+      "regular_expected_games": 1230,
+      "regular_games_per_team": 82,
+      "season_end_year": 2024,
+      "source_documents": [
+        {
+          "path": "bracket2024.md",
+          "representation": "retrieved_markdown",
+          "sha256": "06d730b83979174969d91b79ddd8ae75754510d182cd5bbeaa6c39c7cb76877a"
+        }
+      ]
+    },
+    {
+      "play_in_expected_games": 6,
+      "playoff_expected_games": 84,
+      "playoff_identity_manifest_verified": false,
+      "playoff_series": [
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2025/east-first-round-1",
+          "team_a": "CLE",
+          "team_b": "MIA"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2025/east-first-round-4",
+          "team_a": "IND",
+          "team_b": "MIL"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2025/east-first-round-3",
+          "team_a": "DET",
+          "team_b": "NYK"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2025/east-first-round-2",
+          "team_a": "BOS",
+          "team_b": "ORL"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2025/east-semifinal-1",
+          "team_a": "CLE",
+          "team_b": "IND"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2025/east-semifinal-2",
+          "team_a": "BOS",
+          "team_b": "NYK"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2025/east-final",
+          "team_a": "IND",
+          "team_b": "NYK"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2025/west-first-round-1",
+          "team_a": "MEM",
+          "team_b": "OKC"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2025/west-first-round-4",
+          "team_a": "DEN",
+          "team_b": "LAC"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2025/west-first-round-3",
+          "team_a": "LAL",
+          "team_b": "MIN"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2025/west-first-round-2",
+          "team_a": "GSW",
+          "team_b": "HOU"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2025/west-semifinal-1",
+          "team_a": "DEN",
+          "team_b": "OKC"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2025/west-semifinal-2",
+          "team_a": "GSW",
+          "team_b": "MIN"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2025/west-final",
+          "team_a": "MIN",
+          "team_b": "OKC"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2025/nba-finals",
+          "team_a": "IND",
+          "team_b": "OKC"
+        }
+      ],
+      "regular_expected_games": 1230,
+      "regular_games_per_team": 82,
+      "season_end_year": 2025,
+      "source_documents": [
+        {
+          "path": "bracket2025.md",
+          "representation": "retrieved_markdown",
+          "sha256": "9f9698754eec61d3e87ff556140b668394d8176b322305e3af625774a4dae080"
+        }
+      ]
+    },
+    {
+      "play_in_expected_games": 6,
+      "playoff_expected_games": 85,
+      "playoff_identity_manifest_verified": false,
+      "playoff_series": [
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2026/east-first-round-1",
+          "team_a": "DET",
+          "team_b": "ORL"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2026/east-first-round-4",
+          "team_a": "CLE",
+          "team_b": "TOR"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2026/east-first-round-3",
+          "team_a": "ATL",
+          "team_b": "NYK"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2026/east-first-round-2",
+          "team_a": "BOS",
+          "team_b": "PHI"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2026/east-semifinal-1",
+          "team_a": "CLE",
+          "team_b": "DET"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2026/east-semifinal-2",
+          "team_a": "NYK",
+          "team_b": "PHI"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2026/east-final",
+          "team_a": "CLE",
+          "team_b": "NYK"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2026/west-first-round-1",
+          "team_a": "OKC",
+          "team_b": "PHX"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2026/west-first-round-4",
+          "team_a": "HOU",
+          "team_b": "LAL"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2026/west-first-round-3",
+          "team_a": "DEN",
+          "team_b": "MIN"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2026/west-first-round-2",
+          "team_a": "POR",
+          "team_b": "SAS"
+        },
+        {
+          "expected_games": 4,
+          "series_url": "https://www.nba.com/playoffs/2026/west-semifinal-1",
+          "team_a": "LAL",
+          "team_b": "OKC"
+        },
+        {
+          "expected_games": 6,
+          "series_url": "https://www.nba.com/playoffs/2026/west-semifinal-2",
+          "team_a": "MIN",
+          "team_b": "SAS"
+        },
+        {
+          "expected_games": 7,
+          "series_url": "https://www.nba.com/playoffs/2026/west-final",
+          "team_a": "OKC",
+          "team_b": "SAS"
+        },
+        {
+          "expected_games": 5,
+          "series_url": "https://www.nba.com/playoffs/2026/nba-finals",
+          "team_a": "NYK",
+          "team_b": "SAS"
+        }
+      ],
+      "regular_expected_games": 1230,
+      "regular_games_per_team": 82,
+      "season_end_year": 2026,
+      "source_documents": [
+        {
+          "path": "bracket2026.md",
+          "representation": "retrieved_markdown",
+          "sha256": "a2a089f91f16b947e130ff513dd4ab6240e06c6c93ebb3b1315243cb5c214dc6"
+        }
+      ]
+    }
+  ]
+}
