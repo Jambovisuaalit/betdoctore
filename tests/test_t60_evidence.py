@@ -1,7 +1,5 @@
 """Historical T-60 availability cannot be invented from retrospective scores."""
 import json
-from datetime import UTC, datetime
-
 import pytest
 
 from betdoctore.t60_evidence import audit_file, audit_target, REQUIRED_FEATURES
