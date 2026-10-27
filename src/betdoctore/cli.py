@@ -287,3 +287,20 @@ def advanced_readiness(batch: str, curated_keys: Path, manifest: Path,
         report = readiness_report(session,batch,cutoff,keys,prediction_tipoff,
                                   normalization_verified=False,real_evaluation=True)
     typer.echo(json.dumps(report,indent=2))
+
+
+@app.command()
+def paired_evaluate(model: Path, baseline: Path, periods: Path,
+                    block_days: int = 7, repetitions: int = 2000):
+    """Analyze paired forecast JSON arrays; does not admit sources or approve a model."""
+    from .paired_evaluation import compare
+    report = compare(json.loads(model.read_text()), json.loads(baseline.read_text()),
+                     json.loads(periods.read_text()), block_days=block_days,
+                     repetitions=repetitions)
+    from . import paired_evaluation
+    from .result_sources import sha256
+    report["input_sha256"] = {"model": sha256(model.read_bytes()),
+                              "baseline": sha256(baseline.read_bytes()),
+                              "periods": sha256(periods.read_bytes())}
+    report["evaluator_sha256"] = sha256(Path(paired_evaluation.__file__).read_bytes())
+    typer.echo(json.dumps(report, indent=2))

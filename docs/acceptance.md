@@ -25,3 +25,15 @@ The next business milestone is the first real reproducible regular-season foreca
 The score-only protocol in [regular-evaluation.md](regular-evaluation.md) provides the initial
 limited-cohort assessment while advanced source ingestion/normalization/timing remain separate.
 This is not production approval, proof of forecast improvement or a betting-profitability result.
+
+## Next independent evaluation acceptance contract
+
+The 2022 score-only cohort is development evidence and cannot be reused as a new
+independent test. The next sample requires its own timestamped captures and
+predeclared separate periods. The provisional target is >=300 games from >=2
+periods, without a significance guarantee. Both models share games and cutoff;
+report paired MAE difference and temporal block uncertainty. Advanced rows must
+pass source, definition and availability checks before comparison. Separate model
+and betting-edge validation is mandatory before production approval. See
+[independent-evaluation.md](independent-evaluation.md). New sample admission is
+BLOCKED pending verified new captures and a frozen period inventory.
