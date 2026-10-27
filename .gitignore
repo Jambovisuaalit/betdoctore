@@ -9,3 +9,6 @@ __pycache__/
 artifacts/
 reports/
 data/
+build/
+dist/
+.DS_Store
