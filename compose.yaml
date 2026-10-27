@@ -24,6 +24,12 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://betdoctore:${POSTGRES_PASSWORD}@db:5432/betdoctore
     ports: ["127.0.0.1:8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=3)"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
     depends_on:
       migrate:
         condition: service_completed_successfully

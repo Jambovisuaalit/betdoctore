@@ -35,7 +35,12 @@ jobs:
           POSTGRES_PASSWORD: ci-container-only
         run: |
           docker compose up --build -d --wait
-          curl --fail --retry 20 --retry-delay 2 --retry-connrefused http://127.0.0.1:8000/ready
+          curl --fail --retry 20 --retry-delay 2 --retry-connrefused --retry-all-errors http://127.0.0.1:8000/ready
+      - name: Compose diagnostics
+        if: failure()
+        env:
+          POSTGRES_PASSWORD: ci-container-only
+        run: docker compose logs --no-color
       - name: Stop Compose services
         if: always()
         env:
