@@ -155,3 +155,22 @@ def test_overlapping_games_reserve_unsettled_stakes(monkeypatch):
     assert len(result["bets"]) == 2
     assert result["bets"][0]["stake"] == pytest.approx(.1)
     assert result["bets"][1]["stake"] == pytest.approx(.09)
+
+
+def test_clv_requires_near_tipoff_exact_line_close(monkeypatch):
+    games, odds = dataset()
+    entry = odds[-1]
+    def fake_decision(*args):
+        return {"action": "BET", "side": "over", "stake_fraction": .01,
+                "probabilities": {"mean": 220, "over": .5, "under": .5, "push": 0,
+                                  "model_digest": "synthetic-test"}}
+    monkeypatch.setattr("betdoctore.backtest.decision", fake_decision)
+    model = Model(trained_until=datetime(2019, 1, 1, tzinfo=UTC))
+    assert run(games, [entry], model, Settings())["bets"][0]["clv_price_ratio"] is None
+    close = entry.model_copy(update={"source_id": "synthetic-close", "over": 1.8,
+                                    "observed_at": games[-1].tipoff-timedelta(minutes=2),
+                                    "available_at": games[-1].tipoff-timedelta(minutes=1)})
+    result = run(games, [entry, close], model, Settings())
+    assert result["bets"][0]["clv_price_ratio"] == pytest.approx(1.91/1.8-1)
+    wrong_line = close.model_copy(update={"line": 221.5})
+    assert run(games, [entry, wrong_line], model, Settings())["bets"][0]["clv_price_ratio"] is None

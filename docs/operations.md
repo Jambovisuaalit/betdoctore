@@ -98,9 +98,9 @@ caps a proposed research stake at 1% of available bankroll. Configuration valida
 `--walk-forward` refits on records available at each prediction cutoff. Without it the explicitly
 provided fixed artifact is used only after its training boundary. No odds means a documented skip.
 Latest eligible offer selection is deterministic before looking at results. Open stakes reserve
-bankroll; profits affect subsequent stakes only after game completion. Returns assume completed
+bankroll; profits affect subsequent stakes only after game completion and result availability. Returns assume completed
 full-game markets; voided/cancelled bets need an explicit settlement feed and are outside the
-completed-game input contract. CLV compares entry and last pre-tipoff same-book, same-line prices;
+completed-game input contract. CLV compares entry and last pre-tipoff same-book, same-line prices observed within ten minutes of tipoff;
 missing matching closes are null. This price ratio differs from line-movement CLV.
 
 Brier and log loss use Over/Under/Push classes. MAE/RMSE use total points. Metrics cover eligible

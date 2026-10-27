@@ -70,6 +70,7 @@ def run(games: list[Game], odds: list[Odds], model: Model, settings: Settings,
         closing = [o for o in odds if o.game_id == game.game_id
                    and o.bookmaker == offer.bookmaker and o.line == offer.line
                    and o.includes_overtime == offer.includes_overtime
+                   and game.tipoff - timedelta(minutes=10) <= o.observed_at
                    and max(o.observed_at, o.available_at) < game.tipoff]
         close = max(closing, key=lambda o: o.observed_at) if closing else None
         bet = {"game_id": game.game_id, "side": result["side"], "stake": stake,
