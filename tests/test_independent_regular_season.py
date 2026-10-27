@@ -2,12 +2,14 @@
 import hashlib
 import json
 from datetime import UTC, date, datetime
-from pathlib import Path
 
 import pytest
 
 from betdoctore.independent_regular_season import (
-    ExternalEvent, ReferenceProvenance, audit_regular_seasons, load_external_reference,
+    ExternalEvent,
+    ReferenceProvenance,
+    audit_regular_seasons,
+    load_external_reference,
     write_regular_season_audit,
 )
 from betdoctore.results import BasicResult
