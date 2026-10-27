@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .result_reconciliation import reconcile
 from .result_sources import sha256, write_once
-from .results import BasicResult, TEAMS
+from .results import TEAMS, BasicResult
 from .season_audit import load_contract, load_full_sources
 
 EXISTING_LINEAGE = frozenset({
@@ -72,7 +72,7 @@ class ReferenceProvenance(BaseModel):
     @property
     def review_eligible(self) -> bool:
         return (self.lineage_reviewed
-                and not (set(s.lower() for s in self.derived_from) & EXISTING_LINEAGE))
+                and not ({s.lower() for s in self.derived_from} & EXISTING_LINEAGE))
 
 
 def load_external_reference(events_path: Path, provenance_path: Path):
@@ -83,7 +83,7 @@ def load_external_reference(events_path: Path, provenance_path: Path):
         raise ValueError("Independent reference export SHA-256 does not match receipt")
     payload = json.loads(raw)
     if not isinstance(payload, list):
-        raise ValueError("Reference export must contain a JSON list of events")
+        raise TypeError("Reference export must contain a JSON list of events")
     events = [ExternalEvent.model_validate(row) for row in payload]
     return events, provenance
 
