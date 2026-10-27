@@ -25,7 +25,7 @@ def quarantine(eid="bdl:1"):
     return {"provider_event_id": eid, "season_end_year": 2022,
             "provider_date": "2021-12-01",
             "new_york_tipoff_date": "2021-12-02",
-            "provider_datetime": "2021-12-02T00:30:00Z",
+            "provider_datetime": "2021-12-02T23:30:00Z",
             "home_team_abbreviation": "ATL",
             "away_team_abbreviation": "BOS"}
 
@@ -81,7 +81,7 @@ def test_fail_closed_on_duplicate_provider_id():
 
 
 def test_fail_closed_on_invalid_time_and_team():
-    row = {**quarantine(), "provider_datetime": "2021-12-03T00:30:00Z"}
+    row = {**quarantine(), "provider_datetime": "2021-12-03T23:30:00Z"}
     with pytest.raises(ValueError, match="Inconsistent timezone"):
         triage_private([row], [], audit(), set())
     row = {**quarantine(), "home_team_abbreviation": "NOT_NBA"}
