@@ -37,3 +37,20 @@ class ModelArtifact(Base):
     trained_until: Mapped[object] = mapped_column(DateTime(timezone=True))
     sigma: Mapped[float] = mapped_column(Float)
     payload: Mapped[dict] = mapped_column(JSON)
+
+
+class ResultSourceSnapshot(Base):
+    __tablename__ = "result_source_snapshots"
+    sha256: Mapped[str] = mapped_column(String, primary_key=True)
+    source: Mapped[str] = mapped_column(String)
+    retrieved_at: Mapped[object] = mapped_column(DateTime(timezone=True))
+    manifest: Mapped[dict] = mapped_column(JSON)
+
+
+class BasicResultRow(Base):
+    __tablename__ = "basic_results"
+    __table_args__ = (UniqueConstraint("snapshot_sha256", "game_key"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    snapshot_sha256: Mapped[str] = mapped_column(String)
+    game_key: Mapped[str] = mapped_column(String, index=True)
+    payload: Mapped[dict] = mapped_column(JSON)
