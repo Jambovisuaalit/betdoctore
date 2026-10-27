@@ -5,7 +5,9 @@ import httpx
 import pytest
 
 from betdoctore.commit_history_inventory import (
-    _snapshot, compare_commit_timeline, fetch_commit_candidates,
+    _snapshot,
+    compare_commit_timeline,
+    fetch_commit_candidates,
 )
 from betdoctore.result_sources import sha256
 
