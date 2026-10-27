@@ -26,7 +26,7 @@ def parse_commit(row: dict) -> dict:
     if not isinstance(sha, str) or not GIT_SHA.fullmatch(sha):
         raise ValueError("Invalid Git commit SHA")
     commit = row["commit"]
-    timestamp = datetime.fromisoformat(commit["committer"]["date"].replace("Z", "+00:00"))
+    timestamp = datetime.fromisoformat(commit["committer"]["date"])
     if timestamp.utcoffset() is None or timestamp > datetime.now(UTC):
         raise ValueError("Invalid commit metadata timestamp")
     return {"sha": sha, "committer_claimed_at": timestamp.isoformat(),
