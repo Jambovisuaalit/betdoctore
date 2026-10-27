@@ -5,7 +5,7 @@
 - Editable package installation: passed on Python 3.12.14.
 - Dependency integrity (`pip check`): passed.
 - Ruff static analysis: passed.
-- Pytest: 24 passed. One upstream Starlette/httpx deprecation warning.
+- Pytest: 25 passed. One upstream Starlette/httpx deprecation warning.
 - SQLite migration upgrade, schema drift check, downgrade and re-upgrade: passed.
 - PostgreSQL offline migration SQL generation: passed; this is not a PostgreSQL execution test.
 - Synthetic CLI end-to-end backtest: passed, HTML/JSON created in `reports/fixture`.

@@ -174,3 +174,18 @@ def test_clv_requires_near_tipoff_exact_line_close(monkeypatch):
     assert result["bets"][0]["clv_price_ratio"] == pytest.approx(1.91/1.8-1)
     wrong_line = close.model_copy(update={"line": 221.5})
     assert run(games, [entry, wrong_line], model, Settings())["bets"][0]["clv_price_ratio"] is None
+
+
+def test_cli_accepts_documented_aware_training_timestamp(tmp_path):
+    import json
+
+    from typer.testing import CliRunner
+
+    from betdoctore.cli import app as cli
+    games, _ = dataset(80)
+    path = tmp_path/"synthetic-games.json"
+    path.write_text(json.dumps([g.model_dump(mode="json") for g in games]))
+    result = CliRunner().invoke(cli, ["train", str(path), "2021-01-01T00:00:00Z",
+                                     "--output", str(tmp_path/"models")])
+    assert result.exit_code == 0, result.output
+    assert len(list((tmp_path/"models").glob("*.json"))) == 2

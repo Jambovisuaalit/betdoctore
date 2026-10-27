@@ -1,6 +1,7 @@
 import json
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Annotated
 
 import pandas as pd
 import typer
@@ -61,7 +62,8 @@ def status():
 
 
 @app.command()
-def train(games: Path, trained_until: datetime, output: Path = Path("artifacts")):
+def train(games: Path, trained_until: Annotated[datetime, typer.Argument(formats=["%Y-%m-%dT%H:%M:%S%z"])],
+          output: Path = Path("artifacts")):
     """Fit baseline residual calibration with an explicit availability boundary."""
     from .training import fit, save
     records = [Game.model_validate(r) for r in json.loads(games.read_text())]
@@ -70,7 +72,7 @@ def train(games: Path, trained_until: datetime, output: Path = Path("artifacts")
 
 
 @app.command()
-def feature_snapshot(game_id: str, home: str, away: str, tipoff: datetime):
+def feature_snapshot(game_id: str, home: str, away: str, tipoff: Annotated[datetime, typer.Argument(formats=["%Y-%m-%dT%H:%M:%S%z"])]):
     """Persist an immutable historical snapshot from ingested games."""
     from .repository import snapshot
     with Session(create_engine(Configuration().database_url)) as session:
