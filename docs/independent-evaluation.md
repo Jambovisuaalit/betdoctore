@@ -52,3 +52,7 @@ Stationary Observations](https://doi.org/10.1214/aos/1176347265). The particular
 calendar-day stratification and support checks above are engineering choices,
 not a claim that this finite sample satisfies the paper's asymptotic conditions.
 CLI reports include hashes of all three input files and the evaluator source.
+
+The first outcome-blind [capture inventory](capture-inventory.md) is implemented.
+Its schedule candidates do not yet have compatible admitted score history;
+period selection and new evaluation therefore remain blocked.

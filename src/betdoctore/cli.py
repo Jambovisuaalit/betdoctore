@@ -304,3 +304,17 @@ def paired_evaluate(model: Path, baseline: Path, periods: Path,
                               "periods": sha256(periods.read_bytes())}
     report["evaluator_sha256"] = sha256(Path(paired_evaluation.__file__).read_bytes())
     typer.echo(json.dumps(report, indent=2))
+
+
+@app.command()
+def capture_inventory(directory: Path = Path("data/evaluation/new-capture-inventory"),
+                      private_research: bool = False,
+                      history: Path = Path("data/availability/wayback")):
+    """Inventory new archived schedules; never locks periods or reads current outcomes."""
+    from .capture_inventory import acquire_inventory, inventory_history, save, temporal_support
+    report = acquire_inventory(directory, [2023, 2024, 2025], private_research=private_research)
+    report["score_history_captures"] = inventory_history(history)
+    report["temporal_support"] = temporal_support(report, report["score_history_captures"])
+    report["combined_inventory_path"] = save(directory, "combined-inventory.json", report)
+    typer.echo(json.dumps({key: value for key, value in report.items()
+                          if key not in ("captures", "queries")}, indent=2))
