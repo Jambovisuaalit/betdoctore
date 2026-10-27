@@ -1,0 +1,97 @@
+{
+  "advanced_statistics_verified": false,
+  "attribution": "FiveThirtyEight data: CC BY 4.0; Neil Paine archive: MIT; upstream FiveThirtyEight attribution retained",
+  "captures": [
+    {
+      "captured_at": "2021-05-17T23:08:28+00:00",
+      "cdx_digest": "Q22762ILMKWMXS3U5JP5SCW2N26ZQHNX",
+      "completed_rows_in_scope": 1080,
+      "field_scope": "result_scores_only",
+      "original_url": "https://projects.fivethirtyeight.com/nba-model/nba_elo_latest.csv",
+      "sha256": "bddb92076a42efca0cb3fe6f9adb816cb33aac6e016b982a9e8487e003b0062d",
+      "unique_score_identities": 1080
+    },
+    {
+      "captured_at": "2022-03-05T02:23:16+00:00",
+      "cdx_digest": "6RA2OLO6X5C3ARLSIHGARUL5WZF5G2VN",
+      "completed_rows_in_scope": 2113,
+      "field_scope": "result_scores_only",
+      "original_url": "https://projects.fivethirtyeight.com/nba-model/nba_elo.csv",
+      "sha256": "b2806f043ff6c4b867b0afe9b7cf73e74a7dfba0a31ea4b170e4ce1954a2e953",
+      "unique_score_identities": 2113
+    },
+    {
+      "captured_at": "2022-12-06T22:42:08+00:00",
+      "cdx_digest": "XBUZCNFSQS432IZYJ2SAIUARDIJRD5QJ",
+      "completed_rows_in_scope": 2853,
+      "field_scope": "result_scores_only",
+      "original_url": "https://projects.fivethirtyeight.com/nba-model/nba_elo.csv",
+      "sha256": "5cf962446967b6c001230ddfb2c13af62b8ea7a447194b0cfe6bdd9190c37fbb",
+      "unique_score_identities": 2853
+    },
+    {
+      "captured_at": "2023-04-27T02:57:16+00:00",
+      "cdx_digest": "7Y5I5YUJJDJ5UHJPDSRCAUIBRCJ67JHF",
+      "completed_rows_in_scope": 3767,
+      "field_scope": "result_scores_only",
+      "original_url": "https://projects.fivethirtyeight.com/nba-model/nba_elo.csv",
+      "sha256": "b994633b03396459e4f8625a976427fd602aa1f592b2a1580bfe28bbe2edaef3",
+      "unique_score_identities": 3767
+    },
+    {
+      "captured_at": "2023-04-27T02:57:19+00:00",
+      "cdx_digest": "XAEQJ54HU3BJH2CUZKQBHHNQ5FGQLI6F",
+      "completed_rows_in_scope": 1273,
+      "field_scope": "result_scores_only",
+      "original_url": "https://projects.fivethirtyeight.com/nba-model/nba_elo_latest.csv",
+      "sha256": "6219961c4ec1feb5651318e72181d9492e4f02f610aeb10ae7ba499ed90122c5",
+      "unique_score_identities": 1273
+    },
+    {
+      "captured_at": "2023-07-16T04:12:32+00:00",
+      "cdx_digest": "7SHKOX2HQSGRXJR4PZ44JQ77W7NOJZZQ",
+      "completed_rows_in_scope": 1320,
+      "field_scope": "result_scores_only",
+      "original_url": "https://projects.fivethirtyeight.com/nba-model/nba_elo_latest.csv",
+      "sha256": "a11f81219cda8eab44dcbabe3185b8ff6b253edc2a3ebb19c8a8271cab2382ea",
+      "unique_score_identities": 1320
+    },
+    {
+      "captured_at": "2023-10-24T14:22:54+00:00",
+      "cdx_digest": "7XKBYK4ZSVNDVZDGIEBLSTPNAKKGOVZI",
+      "completed_rows_in_scope": 3814,
+      "field_scope": "result_scores_only",
+      "original_url": "https://projects.fivethirtyeight.com/nba-model/nba_elo.csv",
+      "sha256": "26944ae477b6cd57f3baf2527ad33c4d52386b4eaa0e5b29d49310dddb43f689",
+      "unique_score_identities": 3814
+    },
+    {
+      "captured_at": "2023-10-24T14:24:25+00:00",
+      "cdx_digest": "7SHKOX2HQSGRXJR4PZ44JQ77W7NOJZZQ",
+      "completed_rows_in_scope": 1320,
+      "field_scope": "result_scores_only",
+      "original_url": "https://projects.fivethirtyeight.com/nba-model/nba_elo_latest.csv",
+      "sha256": "a11f81219cda8eab44dcbabe3185b8ff6b253edc2a3ebb19c8a8271cab2382ea",
+      "unique_score_identities": 1320
+    },
+    {
+      "captured_at": "2024-04-29T18:10:21+00:00",
+      "cdx_digest": "MCTC7WXP3DQIMH3MBWPHRIDE5VDYZ7FA",
+      "completed_rows_in_scope": 10154,
+      "field_scope": "result_scores_only",
+      "original_url": "https://raw.githubusercontent.com/Neil-Paine-1/NBA-elo/main/nba_elo.csv",
+      "sha256": "696fde9651fa92a305867c42b2c62a3d43486c37251b8cee81091c3e9b7e152a",
+      "unique_score_identities": 5077
+    }
+  ],
+  "evidence": "Archive payload SHA-1 matches Internet Archive CDX; local artifact also SHA-256 identified",
+  "field_scope": "participant IDs, source calendar dates and final scores only",
+  "first_publication_verified": false,
+  "interpretation": "Capture timestamp is a public available-by upper bound, not first publication or local receipt",
+  "license_urls": [
+    "https://github.com/fivethirtyeight/data/blob/master/LICENSE",
+    "https://github.com/Neil-Paine-1/NBA-elo/blob/main/LICENSE.txt"
+  ],
+  "merged_cdx_index_sha256": "4ea94a149ddc0f93d2a37395b850026bba343d56096958241d463c78e2c44618",
+  "schema_version": 1
+}

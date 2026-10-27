@@ -166,3 +166,23 @@ def results_reconcile(output: Path = Path("data/results/private-reconciliation")
     typer.echo(json.dumps({"report": str(path), **{k: v for k, v in report.items()
                                                   if k not in {"accepted", "quarantine",
                                                                "possible_date_conflicts"}}}, indent=2))
+
+
+@app.command()
+def availability_acquire(directory: Path = Path("data/availability/wayback"),
+                         source: str = "fivethirtyeight"):
+    """Fetch checksum-verified public historical captures; never backdate ingestion."""
+    from .historical_availability import acquire_captures
+    typer.echo(json.dumps(acquire_captures(directory, source=source), indent=2))
+
+
+@app.command()
+def foundation_audit(root: Path = Path("data/results"),
+                     captures: Path = Path("data/availability/wayback"),
+                     index: Path = Path("data/availability/wayback"),
+                     as_of: str = "2026-10-27", output: Path = Path("data/coverage/reports")):
+    """Audit season boundaries, count/identity gaps and field-scoped availability evidence."""
+    from datetime import date
+
+    from .season_audit import run_foundation_audit
+    typer.echo(str(run_foundation_audit(root, captures, index, date.fromisoformat(as_of), output)))

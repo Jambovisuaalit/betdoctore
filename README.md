@@ -51,3 +51,10 @@ or calibration claims are made. The optional CatBoost residual extension is defe
 observations and user-authorized personal/non-commercial exports for 2021–2026. Private exports
 and detailed reconciliation stay local; advanced features remain locked pending coverage and
 conflict resolution. These imports do not establish real-data model/backtest readiness.
+
+## Season and historical-availability audit
+
+The [technical result foundation is accepted](docs/acceptance.md). The separate
+[season/availability audit](docs/season-availability.md) checks season boundaries, Cup-final
+exclusions, playoff series counts and checksum-verified public archive captures. It preserves
+local receipt times and keeps the Pace/ORTG/DRTG join blocked pending the remaining evidence.
