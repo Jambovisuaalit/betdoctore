@@ -1,0 +1,85 @@
+{
+  "audit": {
+    "ADVANCED_STATS_UNLOCKED": false,
+    "coverage_note": "Row counts do not establish complete seasons or date coverage",
+    "coverage_status": "BLOCKED",
+    "errors": [],
+    "first_game": "2021-01-01",
+    "gate_reasons": [
+      "Full 2021\u20132026 coverage requires independent expected-game manifest",
+      "Independent source reconciliation required",
+      "Tipoff/publication metadata not historically verified"
+    ],
+    "independent_crosscheck": {
+      "conflicts": [],
+      "matched": 0,
+      "missing": [],
+      "reference_only": [],
+      "status": "NOT_RUN"
+    },
+    "last_game": "2025-04-13",
+    "missing_years": [
+      2026
+    ],
+    "normalized_sha256": "5f3dd509ddde718b22ed6d88f4d97b2d25d085d97b8b34da5dc61b1c9512b6cb",
+    "parser_version": "basic-results-v1",
+    "parsing": {
+      "accepted_games": 6297,
+      "errors": [],
+      "excluded": {
+        "outside_interval": 139232
+      },
+      "source_rows": 151826
+    },
+    "phase_counts": {
+      "non_playoff_unspecified": 5959,
+      "playoffs": 338
+    },
+    "real_games": 6297,
+    "scope": {
+      "basis": "calendar years",
+      "end": "2026-10-27",
+      "start": "2021-01-01"
+    },
+    "source_manifest": {
+      "advanced_statistics_imported": false,
+      "attribution": "NBA Elo archive: Neil Paine, MIT, Copyright (c) 2024 Neil Paine; derived from FiveThirtyEight NBA Elo, CC BY 4.0. BetDoctore extracts final scores and calendar-date metadata, canonicalizes teams and validates opposing rows. No Elo, forecasts or RAPTOR imported. No endorsement implied.",
+      "bytes": 15487867,
+      "date_precision": "calendar_date_only",
+      "git_commit": "9a485bacef9f18f6a8e3ec671f13b9609386f0fa",
+      "historical_availability_verified": false,
+      "historical_publication_time": null,
+      "license": "MIT; original FiveThirtyEight data attribution CC BY 4.0 retained",
+      "license_sha256": "1545615554fbf1609c3ce1d18f38d879acb4c305d72822f6aeb0c0e4d4a6872d",
+      "license_url": "https://raw.githubusercontent.com/Neil-Paine-1/NBA-elo/9a485bacef9f18f6a8e3ec671f13b9609386f0fa/LICENSE.txt",
+      "original_license_url": "https://github.com/fivethirtyeight/data/blob/master/LICENSE",
+      "retrieved_at": "2026-10-27T06:54:25.809788+00:00",
+      "schema_version": 1,
+      "sha256": "a0d7d27e829ed73d5c132d86ee6e41d4fd07c684c3d23c9c8a8d42f2de9924a5",
+      "source": "neil-paine-nba-elo",
+      "source_approval": "explicit archive MIT grant; retain upstream attribution",
+      "url": "https://raw.githubusercontent.com/Neil-Paine-1/NBA-elo/9a485bacef9f18f6a8e3ec671f13b9609386f0fa/NBA%20Elo%202025%20-%20nba_elo.csv"
+    },
+    "source_snapshots": [
+      "a0d7d27e829ed73d5c132d86ee6e41d4fd07c684c3d23c9c8a8d42f2de9924a5"
+    ],
+    "structural_status": "PASS",
+    "synthetic": false,
+    "unknown_actual_tipoff_games": 6297,
+    "unknown_home_games": 18,
+    "unknown_publication_time_games": 6297,
+    "years": {
+      "2021": 1631,
+      "2022": 1342,
+      "2023": 1255,
+      "2024": 1323,
+      "2025": 746,
+      "2026": 0
+    }
+  },
+  "database": {
+    "advanced_statistics_imported": false,
+    "duplicates": 0,
+    "inserted": 6297
+  }
+}

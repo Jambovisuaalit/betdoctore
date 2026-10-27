@@ -74,3 +74,28 @@ def analysis(game_id: str):
                                for o in latest.values()]}
     finally:
         engine.dispose()
+
+
+@app.get("/results")
+def basic_results(year: int = 2021, offset: int = 0, limit: int = 100):
+    """Observed basic results only; these records do not feed the advanced engine."""
+    from .storage import BasicResultRow, ResultSourceSnapshot
+    if year not in range(2021, 2027) or offset < 0 or not 1 <= limit <= 500:
+        raise HTTPException(422, "Year 2021–2026, offset >= 0 and limit 1–500 required")
+    engine = create_engine(Configuration().database_url)
+    try:
+        with Session(engine) as session:
+            rows = session.scalars(select(BasicResultRow).where(
+                BasicResultRow.payload["game_date"].as_string().startswith(str(year)),
+                BasicResultRow.payload["source"].as_string() == "neil-paine-nba-elo")
+                .order_by(BasicResultRow.game_key, BasicResultRow.snapshot_sha256)
+                .offset(offset).limit(limit)).all()
+            manifests = {r.snapshot_sha256: session.get(ResultSourceSnapshot, r.snapshot_sha256).manifest
+                         for r in rows}
+            return {"results": [r.payload for r in rows], "source_manifests": manifests,
+                    "year": year, "offset": offset, "limit": limit,
+                    "advanced_statistics_imported": False,
+                    "historical_point_in_time_ready": False,
+                    "integrity_status": "STRUCTURAL_ONLY_NOT_FULLY_VERIFIED"}
+    finally:
+        engine.dispose()

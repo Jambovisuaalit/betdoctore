@@ -96,3 +96,73 @@ def register_model(artifact: Path):
                                       payload=payload))
             session.commit()
     typer.echo(identity)
+
+
+@app.command()
+def results_acquire(directory: Path = Path("data/results/neil-paine")):
+    """Download only a pinned, licensed basic-result archive and its license."""
+    from .result_sources import acquire
+    typer.echo(str(acquire(directory)))
+
+
+@app.command()
+def results_import(directory: Path = Path("data/results/neil-paine"),
+                   start: str = "2021-01-01", end: str = "2026-10-27"):
+    """Audit and persist basic results without filling missing advanced statistics."""
+    from datetime import date
+
+    from .result_sources import normalize, persist
+    records, report, manifest = normalize(directory, date.fromisoformat(start), date.fromisoformat(end))
+    if report["structural_status"] != "PASS":
+        typer.echo(json.dumps(report, indent=2))
+        raise typer.Exit(1)
+    with Session(create_engine(Configuration().database_url)) as session:
+        imported = persist(session, records, manifest, report)
+        session.commit()
+    typer.echo(json.dumps({"database": imported, "audit": report}, indent=2))
+
+
+@app.command()
+def private_results_import(directory: Path = Path("data/results/private-fixturedownload"),
+                           start: str = "2021-01-01", end: str = "2026-10-27",
+                           private_research: bool = False):
+    """Personal non-commercial results. Raw records are excluded from public API/Git."""
+    from datetime import date
+
+    from .private_results import acquire_private, normalize_private
+    from .result_sources import persist
+    if not private_research:
+        raise typer.BadParameter("Use --private-research only for personal non-commercial scope")
+    summaries = []
+    for year in range(2020, 2027):
+        acquire_private(directory, year, private_research=True)
+        records, report, manifest = normalize_private(directory/str(year), date.fromisoformat(start),
+                                                     date.fromisoformat(end))
+        if report["structural_status"] != "PASS":
+            raise typer.BadParameter(f"Season {year}: inspect local audit before importing")
+        with Session(create_engine(Configuration().database_url)) as session:
+            imported = persist(session, records, manifest, report)
+            session.commit()
+        summaries.append({"season_start": year, "imported": imported})
+    typer.echo(json.dumps({"use_scope": "private_noncommercial", "seasons": summaries}, indent=2))
+
+
+@app.command()
+def results_reconcile(output: Path = Path("data/results/private-reconciliation"),
+                      start: str = "2021-01-01", end: str = "2026-10-27"):
+    """Write local cross-source reconciliation; conflicts stay quarantined."""
+    from datetime import date
+
+    from sqlalchemy import select
+
+    from .result_reconciliation import reconcile, save_reconciliation
+    from .results import BasicResult
+    from .storage import BasicResultRow
+    with Session(create_engine(Configuration().database_url)) as session:
+        records = [BasicResult.model_validate(r.payload)
+                   for r in session.scalars(select(BasicResultRow)).all()]
+    report = reconcile(records, date.fromisoformat(start), date.fromisoformat(end))
+    path = save_reconciliation(report, output)
+    typer.echo(json.dumps({"report": str(path), **{k: v for k, v in report.items()
+                                                  if k not in {"accepted", "quarantine",
+                                                               "possible_date_conflicts"}}}, indent=2))

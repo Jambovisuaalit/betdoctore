@@ -44,3 +44,10 @@ See [verification evidence](docs/verification.md) for what was actually checked.
 
 All bundled fixtures are explicitly synthetic. No real historical odds, accuracy, profitability
 or calibration claims are made. The optional CatBoost residual extension is deferred.
+
+## Real results foundation
+
+[Basic-result acquisition and integrity workflow](docs/results-data.md) imports licensed archive
+observations and user-authorized personal/non-commercial exports for 2021–2026. Private exports
+and detailed reconciliation stay local; advanced features remain locked pending coverage and
+conflict resolution. These imports do not establish real-data model/backtest readiness.
