@@ -14,7 +14,9 @@
 - Delayed statistics, future outcomes/odds/models, exact-line pairing, push probability, EV/Kelly,
   win/loss/push settlement, overlapping stake reservation and model reproducibility: tested.
 - CSV and Parquet round trips and historical-feed mocked responses: passed.
-- Bytecode compilation: passed.
+- Bytecode compilation and wheel packaging: passed.
+- Additional 80-game synthetic refitting run: 25 predictions, 25 model versions and 25 research
+  betting decisions completed. This is integration coverage, not performance evidence.
 
 No live odds calls were made. The adapter was tested with an explicitly synthetic mocked response.
 Fixture metrics are only synthetic software evidence, and are intentionally not promoted as
