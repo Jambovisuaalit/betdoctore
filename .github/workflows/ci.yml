@@ -30,3 +30,14 @@ jobs:
         with:
           name: synthetic-backtest
           path: reports/fixture
+      - name: Container build and Compose API smoke
+        env:
+          POSTGRES_PASSWORD: ci-container-only
+        run: |
+          docker compose up --build -d --wait
+          curl --fail --retry 20 --retry-delay 2 --retry-connrefused http://127.0.0.1:8000/ready
+      - name: Stop Compose services
+        if: always()
+        env:
+          POSTGRES_PASSWORD: ci-container-only
+        run: docker compose down
