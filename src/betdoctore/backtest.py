@@ -76,9 +76,9 @@ def run(games: list[Game], odds: list[Odds], model: Model, settings: Settings,
                      "profit": profit, "outcome": outcome,
                      "clv_price_ratio": price/getattr(close, result["side"])-1 if close else None}
         bets.append(bet)
-        pending.append((game.completed_at, bet))
+        pending.append((max(game.completed_at, game.observed_at, game.available_at), bet))
     if games:
-        settle(max(g.completed_at for g in games))
+        settle(max(max(g.completed_at, g.observed_at, g.available_at) for g in games))
 
     def avg(key):
         return sum(p[key] for p in predictions)/len(predictions) if predictions else None

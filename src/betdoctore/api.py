@@ -66,7 +66,8 @@ def analysis(game_id: str):
                                 max_bankroll_fraction=config.max_bankroll_fraction)
             model = Model.model_validate(artifact.payload)
             return {"feature_digest": snap.digest, "model_digest": artifact.digest,
-                    "synthetic": model.synthetic or any(o.synthetic for o in offers),
+                    "synthetic": snap.payload.get("synthetic", False) or model.synthetic
+                    or any(o.synthetic for o in offers),
                     "offers": [{"bookmaker": o.bookmaker, "line": o.line,
                                 "source_id": o.source_id,
                                 "analysis": decision(o, snap.payload, model, settings)}

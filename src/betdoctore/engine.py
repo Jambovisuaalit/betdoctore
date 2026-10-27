@@ -60,7 +60,8 @@ def features(games: list[Game], game_id: str, home: str, away: str,
         }
     payload = {"version": "features-v1", "game_id": game_id, "cutoff": cutoff.isoformat(),
                "home": home, "away": away, "teams": teams,
-               "source_digest": digest(used), "source_ids": sorted(used)}
+               "source_digest": digest(used), "source_ids": sorted(used),
+               "synthetic": any(record["synthetic"] for record in used.values())}
     return {**payload, "digest": digest(payload)}
 
 
