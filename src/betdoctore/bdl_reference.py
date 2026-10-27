@@ -37,7 +37,7 @@ def dry_run(start_year: int = 2020, end_year: int = 2025) -> dict:
 
 def normalize(row: dict, season: int, cup_keys: set[str]):
     if not isinstance(row, dict):
-        raise ValueError("Invalid provider record")
+        raise TypeError("Invalid provider record")
     raw_id = row.get("id")
     if not isinstance(raw_id, int) or raw_id <= 0:
         raise ValueError("Missing valid provider event ID")
@@ -50,7 +50,7 @@ def normalize(row: dict, season: int, cup_keys: set[str]):
     day = date.fromisoformat(row["date"])
     stamp = row.get("datetime")
     if stamp:
-        tipoff = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+        tipoff = datetime.fromisoformat(stamp)
         if tipoff.utcoffset() is None:
             raise ValueError("Provider tipoff missing timezone")
         if tipoff.astimezone(ZoneInfo("America/New_York")).date() != day:
@@ -105,7 +105,7 @@ def acquire(output: Path, api_key: str, *, start_year: int = 2020,
                 response.raise_for_status()
                 payload = response.json()
                 if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
-                    raise ValueError("Invalid provider payload")
+                    raise TypeError("Invalid provider payload")
                 for row in payload["data"]:
                     event = normalize(row, season, cups)
                     if event is None:
@@ -117,7 +117,7 @@ def acquire(output: Path, api_key: str, *, start_year: int = 2020,
                     records.append(event)
                 meta = payload.get("meta")
                 if not isinstance(meta, dict):
-                    raise ValueError("Missing pagination metadata")
+                    raise TypeError("Missing pagination metadata")
                 receipts.append({"season": season, "cursor": cursor,
                                  "response_sha256": sha256(response.content),
                                  "rows": len(payload["data"]),
