@@ -2,7 +2,6 @@
 import json
 from datetime import UTC, datetime
 
-import httpx
 import pytest
 
 from betdoctore.bdl_score_audit import _score, acquire_scores
