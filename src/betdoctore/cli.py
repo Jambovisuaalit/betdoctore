@@ -218,3 +218,72 @@ def reference_bdl_acquire(
     from .bdl_reference import run
 
     typer.echo(json.dumps(run(output, execute, start_year, end_year, max_requests), indent=2))
+
+
+@app.command()
+def regular_manifest(root: Path = Path("data/results"), captures: Path = Path("data/availability/wayback"),
+                     as_of: str = "2026-10-27", output: Path = Path("data/regular-season")):
+    """Curate regular targets; keep postseason in its own nonblocking queue."""
+    from datetime import date
+
+    from .historical_availability import capture_evidence, load_capture_index
+    from .regular_season import build_regular_manifest, save_regular_manifest
+    from .season_audit import load_contract, load_full_sources
+    records, schedules, _ = load_full_sources(root,date.fromisoformat(as_of))
+    earliest, _ = capture_evidence(captures,load_capture_index(captures))
+    manifest = build_regular_manifest(records,schedules,load_contract(),date.fromisoformat(as_of),earliest)
+    path = save_regular_manifest(manifest,output)
+    typer.echo(json.dumps({"manifest":str(path),"regular_games":manifest["regular_catalog_games"],
+                          "consistent":manifest["consistent_result_games"],
+                          "quarantined":manifest["quarantined_regular_games"]},indent=2))
+
+
+@app.command()
+def regular_evaluation_acquire(directory: Path = Path("data/evaluation/schedule-captures"),
+                               private_research: bool = False):
+    """Acquire the pinned historical schedules for the private baseline assessment."""
+    from .regular_evaluation import acquire_schedule_captures
+    if not private_research:
+        raise typer.BadParameter("Personal non-commercial scope requires --private-research")
+    typer.echo(json.dumps(acquire_schedule_captures(directory),indent=2))
+
+
+@app.command()
+def regular_evaluate(manifest: Path, history: Path = Path("data/availability/wayback"),
+                     schedules: Path = Path("data/evaluation/schedule-captures"),
+                     output: Path = Path("data/evaluation/real-regular-v1"),
+                     result_root: Path = Path("data/results")):
+    """Freeze causal score-only forecasts, then assess the exact real regular cohort."""
+    from .regular_evaluation import run_evaluation
+    path,result = run_evaluation(history,schedules,manifest,output,result_root)
+    typer.echo(json.dumps({"report":str(path),"status":result["status"],
+                          "model":result["model_metrics"],"benchmark":result["benchmark_metrics"]},indent=2))
+
+
+@app.command()
+def advanced_stage(manifest: Path, rows: Path, raw_source: Path | None = None):
+    """Append an isolated advanced-data batch; incomplete evidence remains quarantined."""
+    from .advanced_staging import AdvancedSourceManifest, stage_batch
+    source = AdvancedSourceManifest.model_validate_json(manifest.read_text())
+    with Session(create_engine(Configuration().database_url)) as session:
+        report = stage_batch(session,source,json.loads(rows.read_text()),
+                             source_bytes=raw_source.read_bytes() if raw_source else None)
+        session.commit()
+    typer.echo(json.dumps(report,indent=2))
+
+
+@app.command()
+def advanced_readiness(batch: str, curated_keys: Path, manifest: Path,
+                       cutoff: Annotated[datetime,typer.Argument(formats=["%Y-%m-%dT%H:%M:%S%z"])],
+                       prediction_tipoff: Annotated[datetime,typer.Argument(formats=["%Y-%m-%dT%H:%M:%S%z"])]):
+    """Assess a selected regular subset; this command never promotes staged rows."""
+    from .advanced_staging import readiness_report
+    from .regular_season import target_gate
+    keys = set(json.loads(curated_keys.read_text()))
+    regular = json.loads(manifest.read_text())
+    if not keys or any(not target_gate(regular,key)["passed"] for key in keys):
+        raise typer.BadParameter("Each selected game must pass the explicit regular result gate")
+    with Session(create_engine(Configuration().database_url)) as session:
+        report = readiness_report(session,batch,cutoff,keys,prediction_tipoff,
+                                  normalization_verified=False,real_evaluation=True)
+    typer.echo(json.dumps(report,indent=2))

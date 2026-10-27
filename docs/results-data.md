@@ -83,3 +83,12 @@ fit or real-data betting backtest was generated in this phase.
 
 See `docs/evidence/results-2021-2026-audit.json` for the redistributable archive's actual local
 import evidence. Detailed private-source findings and disputed scores remain under `data/`.
+
+## Subsequent V1 scope decision
+
+The user authorized a clean selected regular-season cohort to advance independently of the
+postseason backlog. The original whole-history gate is retained as an audit finding, while
+[regular-season.md](regular-season.md), [advanced-staging.md](advanced-staging.md) and
+[regular-evaluation.md](regular-evaluation.md) define the newer per-cohort boundaries.
+No unresolved row or unsupported historical metric is admitted merely because playoffs are
+nonblocking for V1.

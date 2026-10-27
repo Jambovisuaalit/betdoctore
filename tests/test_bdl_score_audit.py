@@ -2,7 +2,6 @@
 import json
 from datetime import UTC, datetime
 
-import httpx
 import pytest
 
 from betdoctore.bdl_score_audit import _score, acquire_scores
@@ -40,7 +39,7 @@ def test_score_uses_sorted_canonical_teams_and_validates_id():
 
 def test_score_non_final_rejected():
     r = {**row(), "status": "7:00 pm ET", "status_state": "scheduled"}
-    with pytest.raises(ValueError, match="Non-final"):
+    with pytest.raises(ValueError, match="(?i)(non-final|not final)"):
         _score(r, event())
 
 

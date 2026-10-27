@@ -38,8 +38,9 @@ See [verification evidence](docs/verification.md) for what was actually checked.
 | Gate | Status |
 | --- | --- |
 | CODE_READY | Baseline implemented; verification evidence linked above |
-| DATA_READY | BLOCKED — licensed historical inputs and integrity audit missing |
-| BACKTEST_READY | Synthetic workflow verified; real-data evaluation BLOCKED |
+| DATA_READY | PARTIAL — curated regular cohorts; unresolved rows remain quarantined |
+| FORECAST_EVALUATION_READY | Limited real score-only regular cohort assessed reproducibly |
+| BETTING_BACKTEST_READY | BLOCKED — real odds and calibrated betting evaluation unverified |
 | PRODUCTION_READY | NO — real-data calibration, reproducibility and backtesting unverified |
 
 All bundled fixtures are explicitly synthetic. No real historical odds, accuracy, profitability
@@ -58,3 +59,11 @@ The [technical result foundation is accepted](docs/acceptance.md). The separate
 [season/availability audit](docs/season-availability.md) checks season boundaries, Cup-final
 exclusions, playoff series counts and checksum-verified public archive captures. It preserves
 local receipt times and keeps the Pace/ORTG/DRTG join blocked pending the remaining evidence.
+
+## V1 parallel work
+
+[Regular-season curation](docs/regular-season.md) and [advanced staging](docs/advanced-staging.md)
+proceed independently of the postseason backlog. The [first real score-only assessment](docs/regular-evaluation.md)
+uses archived pregame schedules and causal result history; detailed private reports stay local.
+Staged advanced rows are never automatically promoted, and missing playoffs do not veto a clean
+regular evaluation cohort.
