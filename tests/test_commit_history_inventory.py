@@ -1,8 +1,5 @@
 """Outcome-blind commit timestamp candidates, not publication or score proof."""
-import base64
-import hashlib
 import json
-from datetime import UTC, datetime
 
 import httpx
 import pytest
@@ -70,7 +67,7 @@ def test_inventory_sha_and_controlled_scope(tmp_path):
         _snapshot(path)
 
 
-def test_github_requests_metadata_only_and_paginates(tmp_path):
+def test_github_requests_metadata_only_and_paginates():
     calls = []
     def respond(req):
         calls.append(req)
