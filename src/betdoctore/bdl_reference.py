@@ -20,6 +20,16 @@ TERMS = "https://www.balldontlie.io/terms.html"
 MIN_INTERVAL_SECONDS = 12.5  # Free plan: max 5 calls per minute.
 
 
+class ProviderDateMismatch(ValueError):
+    """Two date claims disagree; keep both as evidence, never guess the canonical date."""
+
+    def __init__(self, provider_date: date, new_york_date: date):
+        self.provider_date = provider_date
+        self.new_york_date = new_york_date
+        super().__init__("Provider date and New York tipoff date differ: review required")
+
+
+
 def dry_run(start_year: int = 2020, end_year: int = 2025) -> dict:
     if not (2020 <= start_year <= end_year <= 2025):
         raise ValueError("Only completed seasons 2020-21 through 2025-26")
@@ -53,8 +63,9 @@ def normalize(row: dict, season: int, cup_keys: set[str]):
         tipoff = datetime.fromisoformat(stamp)
         if tipoff.utcoffset() is None:
             raise ValueError("Provider tipoff missing timezone")
-        if tipoff.astimezone(ZoneInfo("America/New_York")).date() != day:
-            raise ValueError("Provider date and local tipoff differ: review required")
+        local_day = tipoff.astimezone(ZoneInfo("America/New_York")).date()
+        if local_day != day:
+            raise ProviderDateMismatch(day, local_day)
     def team(side):
         abbreviation = row[side]["abbreviation"]
         key = ALIASES.get(abbreviation, abbreviation)
@@ -84,6 +95,7 @@ def acquire(output: Path, api_key: str, *, start_year: int = 2020,
     owned = client is None
     client = client or httpx.Client(timeout=30, follow_redirects=False)
     receipts, records, excluded = [], [], 0
+    date_quarantine = []
     seen_ids = set()
     cups = {x["game_key"] for x in load_contract()["cup_finals"]}
     try:
@@ -107,13 +119,33 @@ def acquire(output: Path, api_key: str, *, start_year: int = 2020,
                 if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
                     raise TypeError("Invalid provider payload")
                 for row in payload["data"]:
-                    event = normalize(row, season, cups)
+                    # Duplicate provider IDs are fatal, even if an observation is quarantined.
+                    raw_id = row.get("id") if isinstance(row, dict) else None
+                    if not isinstance(raw_id, int) or raw_id <= 0:
+                        raise ValueError("Missing valid provider event ID")
+                    if raw_id in seen_ids:
+                        raise ValueError("Duplicate provider event ID")
+                    seen_ids.add(raw_id)
+                    try:
+                        event = normalize(row, season, cups)
+                    except ProviderDateMismatch as conflict:
+                        date_quarantine.append({
+                            "provider_event_id": f"bdl:{raw_id}",
+                            "season_end_year": season + 1,
+                            "provider_date": str(conflict.provider_date),
+                            "new_york_tipoff_date": str(conflict.new_york_date),
+                            "provider_datetime": row.get("datetime"),
+                            "home_team_abbreviation": (
+                                row.get("home_team") or {}).get("abbreviation"),
+                            "away_team_abbreviation": (
+                                row.get("visitor_team") or {}).get("abbreviation"),
+                            "reason": "PROVIDER_DATE_VS_NEW_YORK_TIPOFF",
+                            "approved": False,
+                        })
+                        continue
                     if event is None:
                         excluded += 1
                         continue
-                    if event.provider_event_id in seen_ids:
-                        raise ValueError("Duplicate provider event ID")
-                    seen_ids.add(event.provider_event_id)
                     records.append(event)
                 meta = payload.get("meta")
                 if not isinstance(meta, dict):
@@ -140,6 +172,9 @@ def acquire(output: Path, api_key: str, *, start_year: int = 2020,
     report = {"status": "ACQUIRED_UNREVIEWED", "provider": "balldontlie-nba",
               "request_count": len(receipts), "events": len(normalized),
               "cup_finals_excluded": excluded,
+              "quarantined_date_mismatches": len(date_quarantine),
+              "date_quarantine_by_season": dict(sorted(Counter(
+                  r["season_end_year"] for r in date_quarantine).items())),
               "counts_by_season": dict(sorted(Counter(
                   r["season_end_year"] for r in normalized).items())),
               "source_sha256": sha256(raw),
@@ -147,6 +182,10 @@ def acquire(output: Path, api_key: str, *, start_year: int = 2020,
               "request_receipts": receipts}
     # All data is local under ignored data/; no source records go to the public API.
     write_once(output / "events.json", raw)
+    write_once(output / "date-quarantine.json",
+               json.dumps(sorted(date_quarantine, key=lambda r: (
+                   r["season_end_year"], r["provider_event_id"])),
+                   sort_keys=True, indent=2).encode())
     write_once(output / "provenance.json", manifest.model_dump_json(indent=2).encode())
     write_once(output / "request-receipts.json",
                json.dumps(report, sort_keys=True, indent=2).encode())

@@ -32,8 +32,24 @@ overwritten. The importer does not purchase plans or access paid endpoints.
 
 ## Audit
 
-The exporter writes `events.json`, `provenance.json` and
-`request-receipts.json`. The provenance receipt defaults to
+The exporter writes `events.json`, `provenance.json`,
+`date-quarantine.json` and `request-receipts.json`.
+If BALLDONTLIE's date differs from the New York calendar date of its
+timestamped tipoff, the exporter **does not guess which is correct**.
+It records both fields and the provider event ID in the private
+`date-quarantine.json`, excludes that event from the identity manifest,
+and continues collecting remaining pages. Count/identity coverage therefore
+remains BLOCKED for the affected season. This is **provider-level**
+quarantine: it is separate from `regular-season-verify`'s cross-source
+score/home quarantine and must be reviewed before approval.
+No original API key or request header is stored.
+
+The provider's `date` field is not silently rewritten to match the
+timestamp. If a discrepancy is confirmed later, correct it through a
+reviewed, separately versioned manifest; do not retroactively rewrite
+`events.json`.
+
+ The provenance receipt defaults to
 `lineage_reviewed: false`: the audit will correctly leave rows pending.
 Only after documented manual review of source lineage and permitted usage,
 set reviewer, evidence and review flag on the **local** provenance file.

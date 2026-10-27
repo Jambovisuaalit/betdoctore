@@ -1,10 +1,11 @@
 """Deterministic BALLDONTLIE importer tests, no live or billable API calls."""
+import json
 from datetime import date
 
 import httpx
 import pytest
 
-from betdoctore.bdl_reference import acquire, dry_run, normalize
+from betdoctore.bdl_reference import ProviderDateMismatch, acquire, dry_run, normalize
 from betdoctore.independent_regular_season import load_external_reference
 
 
@@ -41,7 +42,7 @@ def test_event_normalization_is_explicit_and_timezone_aware():
     assert event.home == "ATL"
     assert event.game_date == date(2021, 12, 1)
     row = {**sample_event(), "datetime": "2021-12-03T00:30:00Z"}
-    with pytest.raises(ValueError, match="local tipoff"):
+    with pytest.raises(ProviderDateMismatch, match="New York tipoff"):
         normalize(row, 2021, set())
 
 
@@ -97,6 +98,40 @@ def test_response_season_and_page_must_match(tmp_path):
     bad = {**sample_event(), "season": 2022}
     client, _ = mock_client([{"data": [bad], "meta": {"next_cursor": None}}])
     with pytest.raises(ValueError, match="season"):
+        acquire(tmp_path, "fixture-key", start_year=2021, end_year=2021,
+                client=client, sleep=lambda _: None)
+    assert not (tmp_path / "events.json").exists()
+
+
+def test_date_mismatch_is_quarantined_without_aborting_other_pages(tmp_path):
+    valid = sample_event()
+    conflicting = {**valid, "id": 1199002, "datetime": "2021-12-03T00:30:00Z"}
+    first = {"data": [valid, conflicting], "meta": {"next_cursor": 7}}
+    second = {"data": [], "meta": {"next_cursor": None}}
+    client, _ = mock_client([first, second])
+    folder = tmp_path / "bdl"
+    report = acquire(folder, "fixture-key", start_year=2021, end_year=2021,
+                     max_requests=2, client=client, sleep=lambda _: None)
+    assert report["events"] == 1
+    assert report["quarantined_date_mismatches"] == 1
+    assert report["date_quarantine_by_season"] == {2022: 1}
+    quarantined = json.loads((folder / "date-quarantine.json").read_text())
+    assert len(quarantined) == 1
+    assert quarantined[0]["provider_event_id"] == "bdl:1199002"
+    assert quarantined[0]["provider_date"] == "2021-12-01"
+    assert quarantined[0]["new_york_tipoff_date"] == "2021-12-02"
+    assert quarantined[0]["approved"] is False
+    events, provenance = load_external_reference(folder / "events.json",
+                                                 folder / "provenance.json")
+    assert len(events) == 1
+    assert provenance.review_eligible is False
+
+
+def test_duplicate_id_already_quarantined_still_blocks_export(tmp_path):
+    conflicting = {**sample_event(), "datetime": "2021-12-03T00:30:00Z"}
+    client, _ = mock_client([{"data": [conflicting, conflicting],
+                              "meta": {"next_cursor": None}}])
+    with pytest.raises(ValueError, match="Duplicate provider event ID"):
         acquire(tmp_path, "fixture-key", start_year=2021, end_year=2021,
                 client=client, sleep=lambda _: None)
     assert not (tmp_path / "events.json").exists()
