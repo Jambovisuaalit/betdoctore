@@ -30,7 +30,7 @@ def record(key_date="2021-12-01", a=100, b=101, source="archive", home="ATL"):
 def event(day="2021-12-01", eid="ind-001", home="ATL"):
     return ExternalEvent(provider_event_id=eid, season_end_year=2022,
                          game_date=date.fromisoformat(day), home=home,
-                         away="BOS", phase="regular_season")
+                         away="ATL" if home == "BOS" else "BOS", phase="regular_season")
 
 
 def provenance(reviewed=True):
