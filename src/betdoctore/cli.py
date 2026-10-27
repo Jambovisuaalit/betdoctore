@@ -204,3 +204,17 @@ def regular_season_verify(
         root, reference_file, provenance_file, output, date.fromisoformat(as_of)
     )
     typer.echo(str(path))
+
+
+@app.command("reference-bdl-acquire")
+def reference_bdl_acquire(
+    output: Path = Path("data/coverage/independent/balldontlie"),
+    execute: bool = False,
+    start_year: int = 2020,
+    end_year: int = 2025,
+    max_requests: int = 100,
+):
+    """Dry-run by default; opt-in free Games API download into local-only archive."""
+    from .bdl_reference import run
+
+    typer.echo(json.dumps(run(output, execute, start_year, end_year, max_requests), indent=2))
