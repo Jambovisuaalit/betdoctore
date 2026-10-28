@@ -1,7 +1,6 @@
 """Wayback capture evidence tests; only synthetic/fixture snapshots, no production data."""
 import base64
 import hashlib
-import json
 
 import httpx
 import pytest
