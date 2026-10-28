@@ -152,6 +152,8 @@ def failure_reason(exc: Exception) -> str:
         return "HTTP_TIMEOUT"
     if isinstance(exc, httpx.RequestError):
         return "HTTP_REQUEST_FAILED"
+    if isinstance(exc, json.JSONDecodeError):
+        return "CDX_RESPONSE_NOT_JSON"
     if isinstance(exc, ValueError):
         return _KNOWN_CDX_ERRORS.get(str(exc), "CDX_VALUE_ERROR_UNCLASSIFIED")
     if isinstance(exc, KeyError):
