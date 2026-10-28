@@ -66,7 +66,7 @@ def fetch_index(client: httpx.Client, url: str, first: datetime,
     if isinstance(data, list) and not data:
         raise ValueError("CDX index returned empty list")
     if not isinstance(data, list) or not isinstance(data[0], list):
-        raise ValueError("Malformed CDX index")
+        raise TypeError("Malformed CDX index")
     header = data[0]
     if (len(set(header)) != len(header) or
             not {"timestamp", "original", "statuscode", "mimetype", "digest"} <= set(header)):
@@ -162,7 +162,8 @@ def failure_reason(exc: Exception) -> str:
     if isinstance(exc, KeyError):
         return "CDX_REQUIRED_KEY_MISSING"
     if isinstance(exc, TypeError):
-        return "CDX_ROW_TYPE_ERROR"
+        return ("CDX_MALFORMED_STRUCTURE" if str(exc) == "Malformed CDX index"
+                else "CDX_ROW_TYPE_ERROR")
     return "INDEX_ERROR_UNCLASSIFIED"
 
 
