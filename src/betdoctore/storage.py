@@ -1,5 +1,5 @@
 """Append-only provenance records and reproducible feature/model snapshots."""
-from sqlalchemy import JSON, Boolean, DateTime, Float, String, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -54,3 +54,24 @@ class BasicResultRow(Base):
     snapshot_sha256: Mapped[str] = mapped_column(String)
     game_key: Mapped[str] = mapped_column(String, index=True)
     payload: Mapped[dict] = mapped_column(JSON)
+
+
+class AdvancedStageBatch(Base):
+    __tablename__ = "advanced_stage_batches"
+    digest: Mapped[str] = mapped_column(String, primary_key=True)
+    source: Mapped[str] = mapped_column(String)
+    snapshot_sha256: Mapped[str] = mapped_column(String)
+    retrieved_at: Mapped[object] = mapped_column(DateTime(timezone=True))
+    manifest: Mapped[dict] = mapped_column(JSON)
+
+
+class AdvancedStageRow(Base):
+    __tablename__ = "advanced_stage_rows"
+    __table_args__ = (UniqueConstraint("batch_digest", "source_row_id"),)
+    digest: Mapped[str] = mapped_column(String, primary_key=True)
+    batch_digest: Mapped[str] = mapped_column(String, ForeignKey("advanced_stage_batches.digest"), index=True)
+    source_row_id: Mapped[str] = mapped_column(String)
+    content_digest: Mapped[str] = mapped_column(String)
+    status: Mapped[str] = mapped_column(String)
+    payload: Mapped[dict] = mapped_column(JSON)
+    validation_reasons: Mapped[list] = mapped_column(JSON)

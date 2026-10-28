@@ -1,0 +1,73 @@
+{
+  "benchmark": "league-last100-fullgame-total-mean",
+  "history_capture_timestamp": "20221206224208",
+  "history_sha256": "5cf962446967b6c001230ddfb2c13af62b8ea7a447194b0cfe6bdd9190c37fbb",
+  "league_window": 100,
+  "maximum_history_capture_age_days": 7,
+  "minimum_team_history": 5,
+  "model": "team-last10-fullgame-total-mean",
+  "not_claimed": [
+    "prospective performance",
+    "full-league coverage",
+    "advanced-feature model performance",
+    "calibration",
+    "profitability",
+    "actual tipoff timing"
+  ],
+  "prediction_cutoff_minutes": 60,
+  "protocol_id": "regular-score-only-captured-history-v1",
+  "schedule_captures": [
+    {
+      "digest": "GOGAG7L5LT2JN3PT6V7P34T3DTSSCMBV",
+      "length": "2660",
+      "mimetype": "application/json",
+      "original": "https://fixturedownload.com/feed/json/nba-2022/atlanta-hawks",
+      "statuscode": "200",
+      "timestamp": "20221206214536",
+      "urlkey": "com,fixturedownload)/feed/json/nba-2022/atlanta-hawks"
+    },
+    {
+      "digest": "BOFA27TGU7OQNLX74B32NNDVQD7STSMD",
+      "length": "2658",
+      "mimetype": "application/json",
+      "original": "https://fixturedownload.com/feed/json/nba-2022/denver-nuggets",
+      "statuscode": "200",
+      "timestamp": "20221206214510",
+      "urlkey": "com,fixturedownload)/feed/json/nba-2022/denver-nuggets"
+    },
+    {
+      "digest": "FEQMVGAKLKF422FKOP4N3BMRQ64XEX4I",
+      "length": "2659",
+      "mimetype": "application/json",
+      "original": "https://fixturedownload.com/feed/json/nba-2022/minnesota-timberwolves",
+      "statuscode": "200",
+      "timestamp": "20221206210051",
+      "urlkey": "com,fixturedownload)/feed/json/nba-2022/minnesota-timberwolves"
+    },
+    {
+      "digest": "HY544J3NZANR4TCTNVVXUPZ23MNEUMRD",
+      "length": "2695",
+      "mimetype": "application/json",
+      "original": "https://fixturedownload.com/feed/json/nba-2022/new-york-knicks",
+      "statuscode": "200",
+      "timestamp": "20221206215324",
+      "urlkey": "com,fixturedownload)/feed/json/nba-2022/new-york-knicks"
+    },
+    {
+      "digest": "FZBEAN2ADOO2FHYXW2TIVJHH2KTCDAY7",
+      "length": "2653",
+      "mimetype": "application/json",
+      "original": "https://fixturedownload.com/feed/json/nba-2022/utah-jazz",
+      "statuscode": "200",
+      "timestamp": "20221206201429",
+      "urlkey": "com,fixturedownload)/feed/json/nba-2022/utah-jazz"
+    }
+  ],
+  "schema_version": 1,
+  "scope": "private_noncommercial",
+  "season_end_year": 2023,
+  "selection_basis": "All five indexed NBA-2022 team schedule captures on 2022-12-06 that overlap the verified history capture; selection precedes outcome scoring.",
+  "synthetic": false,
+  "target": "full_game_total_including_overtime",
+  "team_window": 10
+}
