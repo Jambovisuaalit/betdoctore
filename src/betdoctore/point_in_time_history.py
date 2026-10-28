@@ -60,8 +60,10 @@ def discover_index(inventory: dict, client: httpx.Client) -> tuple[dict, bytes]:
         row = dict(zip(keys, values, strict=True))
         validate_cdx_row(row)
         captured = datetime.strptime(row["timestamp"], "%Y%m%d%H%M%S").replace(tzinfo=UTC)
-        if not start <= captured <= end+timedelta(days=1):
-            raise ValueError("Archive returned an out-of-window capture")
+        # CDX from/to parameters are calendar dates, not exact instants.
+        # Boundary-day captures outside our precise window are not candidates.
+        if not start <= captured <= end:
+            continue
         ident = (row["timestamp"], row["original"], row["digest"])
         if ident not in identifiers:
             identifiers.add(ident)
