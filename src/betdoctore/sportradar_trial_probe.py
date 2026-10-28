@@ -66,7 +66,7 @@ def _nba_game(schedule: dict) -> str | None:
         if (isinstance(game_id, str) and UUID.fullmatch(game_id)
                 and isinstance(when, str) and when.startswith("2020-")):
             options.append((when, game_id))
-    return sorted(options)[0][1] if options else None
+    return min(options)[1] if options else None
 
 
 def _synergy_game(games: dict) -> str | None:
@@ -76,7 +76,7 @@ def _synergy_game(games: dict) -> str | None:
         value = row.get("id")
         if isinstance(value, str) and re.fullmatch(r"[a-zA-Z0-9_-]{8,90}", value):
             options.append(value)
-    return sorted(options)[0] if options else None
+    return min(options) if options else None
 
 
 def _request(client: httpx.Client, key: str, path: str, params: dict,
