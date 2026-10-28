@@ -89,9 +89,9 @@ def test_timezone_aware_tipoff_and_observation_required():
 
 def test_prior_league_day_utc_conversion_accepted():
     payload = _payload()
-    payload["games"][0]["scheduled"] = "2026-10-29T00:00:00+02:00"
+    payload["games"][0]["scheduled"] = "2026-10-29T21:00:00-04:00"
     output = _plan(payload)
-    assert output["games"][0]["scheduled_tipoff_utc"] == "2026-10-28T22:00:00+00:00"
+    assert output["games"][0]["scheduled_tipoff_utc"] == "2026-10-30T01:00:00+00:00"
 
 
 def test_duplicate_game_id_fails_closed():
