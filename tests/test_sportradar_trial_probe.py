@@ -189,6 +189,8 @@ def test_nba_seasons_preflight_401_stops_without_historical_game_calls():
 
 def test_synergy_cannot_be_run_with_nba_preflight_flag():
     import pytest
-    with _client(lambda req: httpx.Response(200, json={})) as client:
-        with pytest.raises(ValueError, match="only supported"):
-            m.probe("synergy", "key", client, preflight_only=True)
+    with (
+        _client(lambda req: httpx.Response(200, json={})) as client,
+        pytest.raises(ValueError, match="only supported"),
+    ):
+        m.probe("synergy", "key", client, preflight_only=True)
