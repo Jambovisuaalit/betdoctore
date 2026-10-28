@@ -138,12 +138,16 @@ def _request(client: httpx.Client, key: str, path: str, params: dict,
     return receipt, payload
 
 
-def probe(scope: str, key: str, client: httpx.Client, pause=time.sleep) -> dict:
+def probe(scope: str, key: str, client: httpx.Client, pause=time.sleep,
+          *, preflight_only: bool = False) -> dict:
     if scope not in ("nba", "synergy") or not key.strip():
         raise ValueError("Specify a supported product and a private API key")
+    if preflight_only and scope != "nba":
+        raise ValueError("Preflight-only is only supported for the NBA v8 Seasons feed")
     received = []
     # Maximum four NBA calls (three seasons + one old game) or three Synergy calls.
-    plan = ([(f"/nba/trial/v8/en/games/{y}/REG/schedule.json", {}) for y in NBA_YEARS]
+    plan = ([("/nba/trial/v8/en/league/seasons.json", {})] if preflight_only else
+            [(f"/nba/trial/v8/en/games/{y}/REG/schedule.json", {}) for y in NBA_YEARS]
             if scope == "nba" else [
                 ("/synergy/basketball/nba/seasons", {"skip": 0, "take": 25}),
                 ("/synergy/basketball/nba/games", {
@@ -174,7 +178,10 @@ def probe(scope: str, key: str, client: httpx.Client, pause=time.sleep) -> dict:
             path = f"/synergy/basketball/nba/games/{synergy_games}/events"
             received.append(_request(client, key, path, {"skip": 0, "take": 2}, scope)[0])
     return {"schema_version": 1, "status": "TRIAL_ACCESS_REVIEW_ONLY",
-            "scope": scope, "checks": received, "calls_consumed": len(received),
+            "scope": scope, "preflight_only": preflight_only,
+            "nba_seasons_endpoint_access_verified": (
+                bool(received) and preflight_only and received[0]["access_verified"]),
+            "checks": received, "calls_consumed": len(received),
             "api_key_stored": False, "raw_response_stored": False,
             "target_games_2024_2025_requested": False,
             "sample_periods_locked": False, "source_admitted_games": 0,
@@ -203,19 +210,29 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--scope", choices=("nba", "synergy"), required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--preflight-only", action="store_true",
+                        help="One NBA v8 Seasons request, without any game/history calls")
     parser.add_argument("--execute", action="store_true",
                         help="Opt in to <=4 NBA or <=3 Synergy authenticated calls")
     args = parser.parse_args()
+    if args.preflight_only and args.scope != "nba":
+        parser.error("--preflight-only requires --scope nba")
     if not args.execute:
         print(json.dumps({"status": "DRY_RUN_NO_API_REQUESTS", "scope": args.scope,
-                          "max_calls": 4 if args.scope == "nba" else 3}, indent=2))
+                          "preflight_only": args.preflight_only,
+                          "max_calls": (1 if args.preflight_only else
+                                        4 if args.scope == "nba" else 3)}, indent=2))
         return
     with httpx.Client(timeout=20, follow_redirects=False, trust_env=False) as client:
-        report = probe(args.scope, _key(args.scope), client)
+        report = probe(args.scope, _key(args.scope), client,
+                       preflight_only=args.preflight_only)
     raw = json.dumps(report, sort_keys=True, indent=2).encode()
     name = f"{sha256(raw)}.sportradar-{args.scope}-trial.json"
     write_once(args.output/name, raw)
     print(json.dumps({"status": report["status"], "scope": args.scope,
+        "preflight_only": report["preflight_only"],
+        "nba_seasons_endpoint_access_verified":
+            report["nba_seasons_endpoint_access_verified"],
         "calls_consumed": report["calls_consumed"],
         "checks": [{"endpoint": r["endpoint"], "status_code": r["status_code"],
                     "error_code": r["error_code"], "access_verified": r["access_verified"],

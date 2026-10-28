@@ -117,3 +117,48 @@ raw provider response bodies. To avoid unnecessary calls, only rerun
 after checking the correct product entitlement and the 429 rate/quota
 status in the Sportradar portal. No CLI syntax, scoring threshold,
 held-out game selection or training gate was changed.
+
+## 2026-10-28 repeat 401 — final auth-only preflight
+
+At clean detached commit `3aa82ea`, the operator again obtained **NBA
+2020 REG schedule HTTP 401** (one call; no 2021/2022 schedule or summary).
+The code's `x-api-key` header and the documented `/nba/trial/v8/en/games/2020/REG/schedule.json`
+URL already match the Sportradar docs. See the official authentication
+instructions: https://developer.sportradar.com/getting-started/docs/authentication
+and historical URL: https://developer.sportradar.com/basketball/docs/nba-ig-historical-data.
+
+Before another historical request, verify the actual NBA trial's **own
+Application > Master API Key** in Marketplace. The app master key only
+authorizes associated subscriptions. A 401 alone cannot prove whether
+the wrong key, missing subscription attachment, an invalid key, or
+another authentication issue caused the failure. Do not paste the key
+in chat or into a GitHub issue.
+
+For a safer one-call distinction, the CLI now supports **NBA-only
+`--preflight-only`**, which calls the officially documented
+`/nba/trial/v8/en/league/seasons.json` endpoint **exactly once**, using
+header authentication. It will not call any dated schedule, target
+fixture, boxscore or summary, regardless of the response. A 200
+verifies access to this **specific Seasons endpoint now**, not to
+historic game scores and not commercial or gambling-model rights.
+A 401 after verification of the application master key should go to
+Sportradar account support, not lead to repeated automated retries.
+
+After confirming the application and its NBA subscription in the
+portal, execute from the clean detached worktree:
+
+```sh
+ROOT="$HOME/Documents/betdoctore"
+WORK="$HOME/Documents/betdoctore-history-review"
+OUT="$ROOT/data/evaluation/sportradar-trial"
+git -C "$ROOT" fetch origin feat/v1-regular-evaluation-staging &&
+test -z "$(git -C "$WORK" status --porcelain)" &&
+git -C "$WORK" switch --detach origin/feat/v1-regular-evaluation-staging &&
+PYTHONPATH="$WORK/src" "$ROOT/.venv/bin/python" -m betdoctore.sportradar_trial_probe \
+  --scope nba --preflight-only --output "$OUT" --execute
+```
+
+Never use the old `--scope nba --execute` until Seasons preflight
+returns 200 and the product rights/terms have been evaluated.
+The output writes only an append-only private metadata receipt,
+never the API key, response body or player/game data.

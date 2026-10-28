@@ -148,3 +148,47 @@ def test_rate_limit_receipt_does_not_claim_as_of_or_license():
     assert out["historical_as_of_availability_verified"] is False
     assert out["source_contract_rights_approved"] is False
     assert out["model_training_eligible"] is False
+
+
+def test_nba_seasons_preflight_success_uses_one_read_only_request():
+    observed = []
+    def respond(request):
+        observed.append(str(request.url))
+        assert request.url.path == "/nba/trial/v8/en/league/seasons.json"
+        assert request.headers["x-api-key"] == "private-key-for-nba"
+        assert "private-key-for-nba" not in str(request.url)
+        return _response({"league": {"name": "NBA"}, "seasons": [
+            {"year": 2020, "type": "REG"}, {"year": 2021, "type": "REG"}]})
+    with _client(respond) as client:
+        result = m.probe("nba", "private-key-for-nba", client,
+                         pause=lambda _: None, preflight_only=True)
+    assert len(observed) == 1
+    assert result["calls_consumed"] == 1
+    assert result["preflight_only"] is True
+    assert result["nba_seasons_endpoint_access_verified"] is True
+    assert result["source_admitted_games"] == 0
+    assert result["historical_as_of_availability_verified"] is False
+    assert result["model_training_eligible"] is False
+    assert "private-key-for-nba" not in json.dumps(result)
+
+
+def test_nba_seasons_preflight_401_stops_without_historical_game_calls():
+    paths = []
+    def respond(request):
+        paths.append(request.url.path)
+        return httpx.Response(401, text="untrusted auth error body")
+    with _client(respond) as client:
+        result = m.probe("nba", "private-test-key", client,
+                         pause=lambda _: None, preflight_only=True)
+    assert paths == ["/nba/trial/v8/en/league/seasons.json"]
+    assert result["calls_consumed"] == 1
+    assert result["checks"][0]["error_code"] == "HTTP_401"
+    assert result["nba_seasons_endpoint_access_verified"] is False
+    assert "untrusted auth error body" not in json.dumps(result)
+
+
+def test_synergy_cannot_be_run_with_nba_preflight_flag():
+    import pytest
+    with _client(lambda req: httpx.Response(200, json={})) as client:
+        with pytest.raises(ValueError, match="only supported"):
+            m.probe("synergy", "key", client, preflight_only=True)
