@@ -63,7 +63,9 @@ def fetch_index(client: httpx.Client, url: str, first: datetime,
     response = client.get(CDX, params=params)
     response.raise_for_status()
     data = response.json()
-    if not isinstance(data, list) or not data or not isinstance(data[0], list):
+    if isinstance(data, list) and not data:
+        raise ValueError("CDX index returned empty list")
+    if not isinstance(data, list) or not isinstance(data[0], list):
         raise ValueError("Malformed CDX index")
     header = data[0]
     if (len(set(header)) != len(header) or
@@ -134,7 +136,8 @@ def preview(inventory: dict, indexes: dict[str, list[dict] | None]) -> dict:
 
 
 _KNOWN_CDX_ERRORS = {
-    "Malformed CDX index": "CDX_MALFORMED_OR_EMPTY_INDEX",
+    "Malformed CDX index": "CDX_MALFORMED_STRUCTURE",
+    "CDX index returned empty list": "CDX_EMPTY_LIST_RESPONSE",
     "Missing CDX index columns": "CDX_MISSING_COLUMNS",
     "CDX row cap: source status remains unknown": "CDX_ROW_CAP",
     "CDX original mismatch": "CDX_ORIGINAL_URL_MISMATCH",

@@ -76,7 +76,9 @@ def test_archive_origin_query_is_exact():
 
 def test_error_classification_is_stable_and_does_not_serialize_response():
     assert m.failure_reason(ValueError("Malformed CDX index")) == (
-        "CDX_MALFORMED_OR_EMPTY_INDEX")
+        "CDX_MALFORMED_STRUCTURE")
+    assert m.failure_reason(ValueError("CDX index returned empty list")) == (
+        "CDX_EMPTY_LIST_RESPONSE")
     assert m.failure_reason(ValueError("CDX original mismatch")) == (
         "CDX_ORIGINAL_URL_MISMATCH")
     assert m.failure_reason(ValueError("embedded response text is untrusted")) == (
@@ -102,7 +104,7 @@ def test_http_failure_maintains_unknown_status_and_reason(tmp_path):
     assert result["source_admitted_games"]==0
 
 
-def test_malformed_cdx_diagnostics_do_not_auto_admit(tmp_path):
+def test_empty_list_cdx_diagnostics_do_not_auto_admit(tmp_path):
     path=tmp_path/"inventory.json"
     path.write_text("{}")
     original=m._snapshot
@@ -114,7 +116,26 @@ def test_malformed_cdx_diagnostics_do_not_auto_admit(tmp_path):
     finally:
         m._snapshot=original
     assert result["failed_sources"]==5
-    assert all(q["error_reason"]=="CDX_MALFORMED_OR_EMPTY_INDEX"
+    assert all(q["error_reason"]=="CDX_EMPTY_LIST_RESPONSE"
                for q in result["source_queries"])
     assert result["source_status_counts"]["INDEX_UNAVAILABLE_NOT_ZERO"]==6
     assert result["source_admitted_games"]==0
+
+
+def test_malformed_structure_differs_from_empty_list(tmp_path):
+    path = tmp_path / "inventory.json"
+    path.write_text("{}")
+    original = m._snapshot
+    m._snapshot = lambda _: inventory()
+    try:
+        with httpx.Client(transport=httpx.MockTransport(
+            lambda request: httpx.Response(200, json={"unexpected": "object"})
+        )) as client:
+            report = m.run(path, tmp_path / "out", client)
+    finally:
+        m._snapshot = original
+    assert report["failed_sources"] == 5
+    assert all(item["error_reason"] == "CDX_MALFORMED_STRUCTURE"
+               for item in report["source_queries"])
+    assert report["source_admitted_games"] == 0
+    assert report["targets_with_index_candidate"] == 0

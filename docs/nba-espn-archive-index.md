@@ -59,3 +59,27 @@ All outputs remain under ignored `data/` on the Mac. No original private
 snapshots are uploaded. The PR stays Draft, `source_admitted_games=0`,
 `periods_locked=false`, `training_eligible=false` and
 `production_ready=false`.
+
+## 2026-10-28 actual local discovery and diagnostics
+
+The user's repeated local index-only searches returned **21** valid CDN
+schedule capture index rows yielding **63/363 timestamp-compatible target
+leads**, and four NBA season / ESPN source lookups returning the combined
+`CDX_MALFORMED_OR_EMPTY_INDEX` error. This mixed error previously could
+represent either an HTTP-200 empty JSON array or a malformed response;
+no source body was downloaded and **zero** games were admitted.
+
+The updated diagnostic distinguishes `CDX_EMPTY_LIST_RESPONSE` from
+`CDX_MALFORMED_STRUCTURE`. An empty array is an exact-URL *index report*
+with no listed matches in the bounded CDX query, not conclusive proof
+that the URL never existed or no other address was archived. Both
+remain `INDEX_FAILED_NOT_ZERO` so source/fixture uncertainty is
+conservatively preserved. Non-JSON responses, HTTP errors, date/URL
+mismatches and response caps have different stable error codes.
+
+Re-run only **the index metadata command** after updating the detached
+worktree; do not download CDN schedule bodies, bypass data-use terms,
+relax the frozen seven-day/T-minus-60 rules, approve source rows, or
+start M2/M3 training. In particular, a CDN schedule may have fixture
+and outcome fields, but archive presence alone is not verified prior
+*score-history* coverage, independent data origin or legal permission.
