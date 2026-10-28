@@ -57,11 +57,13 @@ def test_timestamp_and_date_boundaries():
 
 def test_403_is_unknown_not_zero():
     url=m.SOURCES[0][2]
-    with httpx.Client(transport=httpx.MockTransport(
-        lambda r:httpx.Response(403))) as client:
-        with pytest.raises(httpx.HTTPStatusError):
-            m.fetch_index(client,url,datetime(2024,3,1,tzinfo=UTC),
-                          datetime(2024,3,15,tzinfo=UTC))
+    with (
+        httpx.Client(transport=httpx.MockTransport(
+            lambda r:httpx.Response(403))) as client,
+        pytest.raises(httpx.HTTPStatusError),
+    ):
+        m.fetch_index(client,url,datetime(2024,3,1,tzinfo=UTC),
+                      datetime(2024,3,15,tzinfo=UTC))
 
 
 def test_archive_origin_query_is_exact():
