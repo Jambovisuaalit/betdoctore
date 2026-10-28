@@ -80,7 +80,7 @@ def test_beyond_one_week_horizon_rejected():
 def test_timezone_aware_tipoff_and_observation_required():
     payload = _payload()
     payload["games"][0]["scheduled"] = "2026-10-29T18:00:00"
-    with pytest.raises(ValueError, match="Timezone-aware"):
+    with pytest.raises(ValueError, match="timezone-aware"):
         _plan(payload)
     with pytest.raises(ValueError, match="Timezone-aware"):
         m.make_plan(_payload(), created_at=datetime(2026, 10, 28),
