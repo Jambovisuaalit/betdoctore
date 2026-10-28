@@ -73,3 +73,47 @@ Rights remain separate: Sportradar trial entitlement does not establish
 a data-storage, redistribution, commercial or gambling-model licence.
 Inspect contract/terms before further ingestion. If 403/401/429 or
 oversized response appears, the script stops within its bounded scope.
+
+## Operator test findings and fail-closed remediation (2026-10-28)
+
+The local operator ran the key-hidden read-only probe on detached commit
+`3cf836f`. Actual results: **NBA 2020 REG schedule HTTP 401** (one call;
+2021/2022 were not tested); **Synergy seasons HTTP 200**, then **Synergy
+games HTTP 429** (two calls; no events requested). Private content-hash
+receipts exist locally. This proves connectivity and limited Synergy season
+endpoint access only. No rights, game events, or history was approved.
+
+Official reference:
+- https://developer.sportradar.com/getting-started/docs/response-codes
+  defines 401 as lacking valid authentication to the requested resource,
+  and 429 as either an exhausted quota or throttled request cadence.
+- https://developer.sportradar.com/getting-started/docs/your-account
+  explains application-specific master keys, products attached to each
+  application and default 1 QPS / 1,000 rolling-30-day trial quota.
+- https://developer.sportradar.com/basketball/reference/get_basketball-league-games
+  confirms the Synergy Games endpoint and minDate/maxDate/skip/take.
+
+**Before retrying NBA** check the Marketplace application hosting the
+active *NBA API* trial and copy that application's own Master API Key.
+The Synergy trial might belong to a different application; a successful
+Synergy key is not proof the same key grants NBA API access. A 401 can
+also reflect another entitlement or credential problem; it does not
+establish that the 2020 schedule is unavailable.
+
+**Before retrying Synergy** inspect its product Usage/QPS and Error Log
+for the HTTP 429. Distinguish 30-day quota exhaustion from throttling;
+with only two recorded calls this is not identifiable from the status
+code alone. The follow-up probe now includes a conservative **3-second
+interval**, saves allowlisted `Retry-After`, `X-RateLimit-Remaining`,
+`X-RateLimit-Limit`, `X-RateLimit-Reset` and `X-Request-ID` headers
+when present, and does **not** automatically retry a 429.
+
+The program supports `SPORTRADAR_NBA_API_KEY` and
+`SPORTRADAR_SYNERGY_API_KEY` as *optional local environment variables*,
+falling back to `SPORTRADAR_API_KEY`; with none set, it prompts for the
+correct **scope-specific** application master key invisibly. Do not
+export keys in terminal commands/history, share them here, or store
+raw provider response bodies. To avoid unnecessary calls, only rerun
+after checking the correct product entitlement and the 429 rate/quota
+status in the Sportradar portal. No CLI syntax, scoring threshold,
+held-out game selection or training gate was changed.

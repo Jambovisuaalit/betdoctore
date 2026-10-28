@@ -107,3 +107,44 @@ def test_selection_ignores_scores_and_invalid_ids():
                                      "56767fa6-731c-403e-9534-491a20c15ac0")
     assert m._synergy_game({"data":[{"id":"bad space"},{"id":"historicalgame2021"}]}) == (
                            "historicalgame2021")
+
+
+def test_429_keeps_safe_rate_limit_headers_and_stops_without_retry():
+    paths = []
+    paused = []
+    def respond(req):
+        paths.append(req.url.path)
+        if req.url.path.endswith("/seasons"):
+            return _response({"data": []})
+        return httpx.Response(429, text="not-safe-to-log", headers={
+            "Retry-After": "15", "X-RateLimit-Remaining": "0",
+            "X-Request-ID": "request-test", "X-API-KEY": "must-never-save",
+        })
+    with _client(respond) as client:
+        out = m.probe("synergy", "private-key", client, pause=paused.append)
+    assert out["calls_consumed"] == 2
+    assert paused == [m.MIN_INTERVAL_SEC]
+    assert out["checks"][-1]["error_code"] == "HTTP_429"
+    assert out["checks"][-1]["response_headers"]["retry-after"] == "15"
+    assert out["checks"][-1]["response_headers"]["x-ratelimit-remaining"] == "0"
+    assert "must-never-save" not in json.dumps(out)
+    assert "not-safe-to-log" not in json.dumps(out)
+    assert "private-key" not in json.dumps(out)
+
+
+def test_product_specific_application_keys_and_no_implicit_product_sharing(monkeypatch):
+    monkeypatch.setenv("SPORTRADAR_API_KEY", "generic-app-key")
+    monkeypatch.setenv("SPORTRADAR_NBA_API_KEY", "nba-app-key")
+    monkeypatch.setenv("SPORTRADAR_SYNERGY_API_KEY", "synergy-app-key")
+    assert m._key("nba") == "nba-app-key"
+    assert m._key("synergy") == "synergy-app-key"
+
+
+def test_rate_limit_receipt_does_not_claim_as_of_or_license():
+    with _client(lambda req: httpx.Response(429, json={"message": "over quota"})) as client:
+        out = m.probe("synergy", "key", client, pause=lambda _: None)
+    assert out["calls_consumed"] == 1
+    assert out["source_admitted_games"] == 0
+    assert out["historical_as_of_availability_verified"] is False
+    assert out["source_contract_rights_approved"] is False
+    assert out["model_training_eligible"] is False

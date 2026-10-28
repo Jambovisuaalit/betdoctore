@@ -19,7 +19,10 @@ SYNERGY_MIN = "2021-12-01T00:00:00Z"
 SYNERGY_MAX = "2021-12-03T00:00:00Z"
 MAX_BYTES = 12 * 1024 * 1024
 UUID = re.compile(r"^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$")
-SAFE_HEADERS = ("date", "etag", "last-modified", "x-generated-date", "content-type")
+SAFE_HEADERS = ("date", "etag", "last-modified", "x-generated-date", "content-type",
+                "retry-after", "x-ratelimit-limit", "x-ratelimit-remaining",
+                "x-ratelimit-reset", "x-request-id")
+MIN_INTERVAL_SEC = 3.0  # Conservative probe cadence; no 429 retry.
 FIELD_HINTS = ("playtype", "shotx", "shoty", "lineup", "oplayer", "dplayer",
                "rplayer", "possessions", "offensive_rating", "defensive_rating")
 
@@ -151,7 +154,7 @@ def probe(scope: str, key: str, client: httpx.Client, pause=time.sleep) -> dict:
     synergy_games = None
     for path, params in plan:
         if received:
-            pause(1.1)  # Stay below the default trial 1-QPS threshold.
+            pause(MIN_INTERVAL_SEC)  # Extra margin; still no 429 retry.
         receipt, obj = _request(client, key, path, params, scope)
         received.append(receipt)
         if scope == "nba" and path.endswith("/2020/REG/schedule.json") and obj:
@@ -163,11 +166,11 @@ def probe(scope: str, key: str, client: httpx.Client, pause=time.sleep) -> dict:
             break
     else:
         if scope == "nba" and nba_first:
-            pause(1.1)
+            pause(MIN_INTERVAL_SEC)
             path = f"/nba/trial/v8/en/games/{nba_first}/summary.json"
             received.append(_request(client, key, path, {}, scope)[0])
         if scope == "synergy" and synergy_games:
-            pause(1.1)
+            pause(MIN_INTERVAL_SEC)
             path = f"/synergy/basketball/nba/games/{synergy_games}/events"
             received.append(_request(client, key, path, {"skip": 0, "take": 2}, scope)[0])
     return {"schema_version": 1, "status": "TRIAL_ACCESS_REVIEW_ONLY",
@@ -181,10 +184,16 @@ def probe(scope: str, key: str, client: httpx.Client, pause=time.sleep) -> dict:
             "model_training_eligible": False, "production_ready": False}
 
 
-def _key() -> str:
-    result = os.environ.get("SPORTRADAR_API_KEY")
+def _key(scope: str) -> str:
+    """Choose the application master key covering this exact product."""
+    if scope not in ("nba", "synergy"):
+        raise ValueError("Unexpected Sportradar product")
+    scoped_env = f"SPORTRADAR_{scope.upper()}_API_KEY"
+    result = os.environ.get(scoped_env) or os.environ.get("SPORTRADAR_API_KEY")
     if result is None:
-        result = getpass.getpass("Sportradar API key (hidden, not stored): ")
+        result = getpass.getpass(
+            f"Sportradar {scope.upper()} application API key (hidden, not stored): "
+        )
     if not result.strip():
         raise ValueError("Missing key")
     return result
@@ -202,7 +211,7 @@ def main() -> None:
                           "max_calls": 4 if args.scope == "nba" else 3}, indent=2))
         return
     with httpx.Client(timeout=20, follow_redirects=False, trust_env=False) as client:
-        report = probe(args.scope, _key(), client)
+        report = probe(args.scope, _key(args.scope), client)
     raw = json.dumps(report, sort_keys=True, indent=2).encode()
     name = f"{sha256(raw)}.sportradar-{args.scope}-trial.json"
     write_once(args.output/name, raw)
@@ -210,7 +219,9 @@ def main() -> None:
         "calls_consumed": report["calls_consumed"],
         "checks": [{"endpoint": r["endpoint"], "status_code": r["status_code"],
                     "error_code": r["error_code"], "access_verified": r["access_verified"],
-                    "observed_fields": r["observed_fields"]}
+                    "observed_fields": r["observed_fields"],
+                    "retry_after": r["response_headers"].get("retry-after"),
+                    "rate_limit_remaining": r["response_headers"].get("x-ratelimit-remaining")}
                    for r in report["checks"]],
         "private_report": str(args.output/name),
         "source_admitted_games": 0, "model_training_eligible": False}, indent=2))
