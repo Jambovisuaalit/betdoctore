@@ -33,7 +33,7 @@ def _utc(value: datetime) -> datetime:
 
 def _datetime(value: object) -> datetime:
     if not isinstance(value, str):
-        raise ValueError("Missing timestamp")
+        raise TypeError("Missing timestamp")
     try:
         return _utc(datetime.fromisoformat(value))
     except ValueError as exc:
@@ -42,7 +42,7 @@ def _datetime(value: object) -> datetime:
 
 def _date(value: object) -> date:
     if not isinstance(value, str):
-        raise ValueError("Missing league day")
+        raise TypeError("Missing league day")
     try:
         parsed = date.fromisoformat(value)
     except ValueError as exc:
@@ -54,7 +54,7 @@ def _date(value: object) -> date:
 
 def _game_info(game: object, league_day: date) -> tuple[str, datetime, str, str]:
     if not isinstance(game, dict):
-        raise ValueError("Invalid game object")
+        raise TypeError("Invalid game object")
     if any(game.get(k) is not None for k in RESULT_KEYS):
         raise ValueError("Score/outcome data must not enter a pregame plan")
     if game.get("status") not in VALID_STATUS:
@@ -67,7 +67,7 @@ def _game_info(game: object, league_day: date) -> tuple[str, datetime, str, str]
         raise ValueError("Invalid provider game ID")
     home, away = game.get("home"), game.get("away")
     if not isinstance(home, dict) or not isinstance(away, dict):
-        raise ValueError("Missing team objects")
+        raise TypeError("Missing team objects")
     home_alias, away_alias = home.get("alias"), away.get("alias")
     if (not isinstance(home_alias, str) or not isinstance(away_alias, str)
             or ALIAS.fullmatch(home_alias) is None
@@ -86,7 +86,7 @@ def make_plan(payload: object, *, created_at: datetime, input_sha256: str,
     """
     now = _utc(created_at)
     if not isinstance(payload, dict) or not isinstance(payload.get("games"), list):
-        raise ValueError("Expected Daily Schedule JSON object with games array")
+        raise TypeError("Expected Daily Schedule JSON object with games array")
     league = payload.get("league")
     if not isinstance(league, dict) or league.get("alias") != "NBA":
         raise ValueError("Not an NBA Daily Schedule payload")
