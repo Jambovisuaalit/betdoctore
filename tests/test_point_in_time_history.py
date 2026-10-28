@@ -69,10 +69,12 @@ def test_tampered_capture_fails_before_review(tmp_path):
     with httpx.Client(transport=httpx.MockTransport(
         lambda req: httpx.Response(200, json=idx))) as client:
         discovery, _ = discover_index(sample_inventory(), client)
-    with httpx.Client(transport=httpx.MockTransport(
-        lambda req: httpx.Response(200, content=raw + b"tampered"))) as client:
-        with pytest.raises(ValueError, match="digest"):
-            verify_bodies(discovery, idx, client, tmp_path)
+    with (
+        httpx.Client(transport=httpx.MockTransport(
+            lambda req: httpx.Response(200, content=raw + b"tampered"))) as client,
+        pytest.raises(ValueError, match="digest"),
+    ):
+        verify_bodies(discovery, idx, client, tmp_path)
     assert not list(tmp_path.glob("*review.json"))
 
 
@@ -93,7 +95,9 @@ def test_index_over_limit_fails_closed():
     raw = sample_csv()
     record = source_row(raw)
     idx = [list(record)] + [list(record.values())] * 5000
-    with httpx.Client(transport=httpx.MockTransport(
-        lambda req: httpx.Response(200, json=idx))) as client:
-        with pytest.raises(ValueError, match="cap"):
-            discover_index(sample_inventory(), client)
+    with (
+        httpx.Client(transport=httpx.MockTransport(
+            lambda req: httpx.Response(200, json=idx))) as client,
+        pytest.raises(ValueError, match="cap"),
+    ):
+        discover_index(sample_inventory(), client)
