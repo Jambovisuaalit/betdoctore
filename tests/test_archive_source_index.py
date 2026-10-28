@@ -72,3 +72,49 @@ def test_archive_origin_query_is_exact():
     assert m.canonical(one)!=m.canonical(one.replace("limit=500","limit=501"))
     assert m.relevant(m.fixtures(inventory())[0],2023,None)
     assert not m.relevant(m.fixtures(inventory())[1],2023,None)
+
+
+def test_error_classification_is_stable_and_does_not_serialize_response():
+    assert m.failure_reason(ValueError("Malformed CDX index")) == (
+        "CDX_MALFORMED_OR_EMPTY_INDEX")
+    assert m.failure_reason(ValueError("CDX original mismatch")) == (
+        "CDX_ORIGINAL_URL_MISMATCH")
+    assert m.failure_reason(ValueError("embedded response text is untrusted")) == (
+        "CDX_VALUE_ERROR_UNCLASSIFIED")
+
+
+def test_http_failure_maintains_unknown_status_and_reason(tmp_path):
+    path=tmp_path/"inventory.json"
+    path.write_text("{}")
+    original=m._snapshot
+    m._snapshot=lambda _:inventory()
+    try:
+        with httpx.Client(transport=httpx.MockTransport(
+            lambda request:httpx.Response(403))) as client:
+            result=m.run(path,tmp_path/"out",client)
+    finally:
+        m._snapshot=original
+    assert result["target_candidates"]==2
+    assert result["targets_with_index_candidate"]==0
+    assert result["failed_sources"]==5
+    assert all(q["status"]=="INDEX_FAILED_NOT_ZERO" for q in result["source_queries"])
+    assert all(q["error_reason"]=="HTTP_STATUS_403" for q in result["source_queries"])
+    assert result["source_admitted_games"]==0
+
+
+def test_malformed_cdx_diagnostics_do_not_auto_admit(tmp_path):
+    path=tmp_path/"inventory.json"
+    path.write_text("{}")
+    original=m._snapshot
+    m._snapshot=lambda _:inventory()
+    try:
+        with httpx.Client(transport=httpx.MockTransport(
+            lambda request:httpx.Response(200,json=[]))) as client:
+            result=m.run(path,tmp_path/"out",client)
+    finally:
+        m._snapshot=original
+    assert result["failed_sources"]==5
+    assert all(q["error_reason"]=="CDX_MALFORMED_OR_EMPTY_INDEX"
+               for q in result["source_queries"])
+    assert result["source_status_counts"]["INDEX_UNAVAILABLE_NOT_ZERO"]==6
+    assert result["source_admitted_games"]==0
