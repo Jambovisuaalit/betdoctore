@@ -12,6 +12,7 @@ import httpx
 
 from .commit_history_inventory import _snapshot
 from .historical_availability import CDX_URL, NEIL_ORIGINAL, validate_cdx_row, verify_capture
+from .private_results import NAMES
 from .result_sources import sha256, write_once
 from .results import ALIASES, TEAMS
 
@@ -172,7 +173,7 @@ def verify_bodies(discovery: dict, index: list, client: httpx.Client,
                 ZoneInfo("America/New_York")).date()
             game_set = {k for k in verified["historical_keys"] if k[0] < day}
             # Never read or use target-game result values.
-            home, away = (ALIASES.get(x, x) for x in fixture[1:])
+            home, away = (NAMES.get(x, ALIASES.get(x, x)) for x in fixture[1:])
             if home not in TEAMS or away not in TEAMS or home == away:
                 status = "UNKNOWN_TEAM_IDENTITY"
             elif any(k[0] == day and set(k[1:]) == {home, away}
