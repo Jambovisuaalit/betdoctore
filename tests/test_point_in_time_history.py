@@ -83,7 +83,7 @@ def test_seven_day_cutoff_enforced():
     record = source_row(raw)
     late = {**record, "timestamp": "20240315000100"}
     old = {**record, "timestamp": "20240301000000"}
-    idx = [list(record), list(late), list(old)]
+    idx = [list(record), list(late.values()), list(old.values())]
     with httpx.Client(transport=httpx.MockTransport(
         lambda req: httpx.Response(200, json=idx))) as client:
         report, _ = discover_index(sample_inventory(), client)
