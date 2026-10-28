@@ -133,6 +133,34 @@ def preview(inventory: dict, indexes: dict[str, list[dict] | None]) -> dict:
             "training_eligible": False, "production_ready": False, "cases": cases}
 
 
+_KNOWN_CDX_ERRORS = {
+    "Malformed CDX index": "CDX_MALFORMED_OR_EMPTY_INDEX",
+    "Missing CDX index columns": "CDX_MISSING_COLUMNS",
+    "CDX row cap: source status remains unknown": "CDX_ROW_CAP",
+    "CDX original mismatch": "CDX_ORIGINAL_URL_MISMATCH",
+    "Unexpected CDX MIME or status": "CDX_MIME_OR_STATUS_MISMATCH",
+    "Malformed CDX timestamp or digest": "CDX_BAD_TIMESTAMP_OR_DIGEST",
+    "Unapproved archive URL": "CDX_UNAPPROVED_URL",
+}
+
+
+def failure_reason(exc: Exception) -> str:
+    """Stable, non-sensitive failure codes; never serialize arbitrary error text."""
+    if isinstance(exc, httpx.HTTPStatusError):
+        return f"HTTP_STATUS_{exc.response.status_code}"
+    if isinstance(exc, httpx.TimeoutException):
+        return "HTTP_TIMEOUT"
+    if isinstance(exc, httpx.RequestError):
+        return "HTTP_REQUEST_FAILED"
+    if isinstance(exc, ValueError):
+        return _KNOWN_CDX_ERRORS.get(str(exc), "CDX_VALUE_ERROR_UNCLASSIFIED")
+    if isinstance(exc, KeyError):
+        return "CDX_REQUIRED_KEY_MISSING"
+    if isinstance(exc, TypeError):
+        return "CDX_ROW_TYPE_ERROR"
+    return "INDEX_ERROR_UNCLASSIFIED"
+
+
 def run(inventory_path: Path, out: Path, client: httpx.Client) -> dict:
     inventory = _snapshot(inventory_path)
     targets = fixtures(inventory)
@@ -154,7 +182,9 @@ def run(inventory_path: Path, out: Path, client: httpx.Client) -> dict:
         except (httpx.HTTPError, ValueError, TypeError, KeyError) as exc:
             indexes[name] = None
             sources.append({"name": name, "publisher": publisher,
-                            "status": "INDEX_FAILED_NOT_ZERO", "error_class": type(exc).__name__})
+                            "status": "INDEX_FAILED_NOT_ZERO",
+                            "error_class": type(exc).__name__,
+                            "error_reason": failure_reason(exc)})
     report = preview(inventory, indexes)
     report["source_queries"] = sources
     report["failed_sources"] = sum(x["status"] != "INDEX_FETCHED" for x in sources)
