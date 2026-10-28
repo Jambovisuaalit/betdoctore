@@ -160,6 +160,8 @@ def verify_bodies(discovery: dict, index: list, client: httpx.Client,
     for case in discovery["cases"]:
         fixture = case["fixture"]
         cutoff = _cutoff(tuple(fixture))
+        if cutoff.isoformat() != case["cutoff"]:
+            raise ValueError("Frozen T-60 cutoff differs from schedule-derived cutoff")
         selected = case["capture"]
         row = {k: v for k, v in case.items() if k != "capture"}
         if selected is None:
