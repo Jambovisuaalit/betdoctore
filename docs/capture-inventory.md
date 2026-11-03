@@ -52,3 +52,12 @@ loading outcomes, then calculate paired MAE/RMSE and temporal-block uncertainty.
 Advanced comparisons still require separately approved Pace/ORtg/DRtg evidence.
 Production approval remains blocked pending separate model and betting-edge
 validation. The 2022 development cohort remains excluded.
+
+## Supplement, 2026-11-03
+
+The original zero timestamp-compatible-history count above applies to the then
+inventoried CSV score files. It is not the current source ceiling. Literal HTML
+JSON exports and UTC result tables have since been verified, producing 402 causal
+capacity candidates. The [locked temporal research assessment](temporal-evaluation.md)
+froze all 402 and admitted 298 after original-byte and fixed quality checks.
+The original immutable inventory remains unchanged.

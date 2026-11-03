@@ -37,3 +37,12 @@ pass source, definition and availability checks before comparison. Separate mode
 and betting-edge validation is mandatory before production approval. See
 [independent-evaluation.md](independent-evaluation.md). New sample admission is
 BLOCKED pending verified new captures and a frozen period inventory.
+
+## Temporal research assessment, 2026-11-03
+
+The source-backed [locked assessment](temporal-evaluation.md) froze 402 forecasts
+before adjudication and evaluated 298 games after fixed quality exclusions. Both
+models share games/cutoffs. The 300-game planning target and primary seven-day
+uncertainty support gate were not met. This is a completed retrospective research
+run, not model, betting-edge or production approval. The exposed cohort is retained
+for reproducibility and cannot become a new independent test after tuning.

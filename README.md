@@ -39,12 +39,13 @@ See [verification evidence](docs/verification.md) for what was actually checked.
 | --- | --- |
 | CODE_READY | Baseline implemented; verification evidence linked above |
 | DATA_READY | PARTIAL — curated regular cohorts; unresolved rows remain quarantined |
-| FORECAST_EVALUATION_READY | Limited real score-only regular cohort assessed reproducibly |
+| FORECAST_EVALUATION_READY | 298 real games across three strata; primary uncertainty gate remains blocked |
 | BETTING_BACKTEST_READY | BLOCKED — real odds and calibrated betting evaluation unverified |
 | PRODUCTION_READY | NO — real-data calibration, reproducibility and backtesting unverified |
 
-All bundled fixtures are explicitly synthetic. No real historical odds, accuracy, profitability
-or calibration claims are made. The optional CatBoost residual extension is deferred.
+All bundled fixtures are explicitly synthetic. Measured real score-only research results are
+documented separately; no calibrated production accuracy, historical betting profitability
+or betting-edge claims are made. The optional CatBoost residual extension is deferred.
 
 ## Real results foundation
 
@@ -67,3 +68,7 @@ proceed independently of the postseason backlog. The [first real score-only asse
 uses archived pregame schedules and causal result history; detailed private reports stay local.
 Staged advanced rows are never automatically promoted, and missing playoffs do not veto a clean
 regular evaluation cohort.
+
+The [new locked temporal assessment](docs/temporal-evaluation.md) evaluated 298 of 402
+frozen forecasts. The 300-game planning target and primary uncertainty gate remain unmet;
+this does not approve a production model or betting edge.

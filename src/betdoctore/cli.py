@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated
 
+import httpx
 import pandas as pd
 import typer
 from sqlalchemy import create_engine
@@ -318,3 +319,111 @@ def capture_inventory(directory: Path = Path("data/evaluation/new-capture-invent
     report["combined_inventory_path"] = save(directory, "combined-inventory.json", report)
     typer.echo(json.dumps({key: value for key, value in report.items()
                           if key not in ("captures", "queries")}, indent=2))
+
+
+@app.command()
+def export_discover(year: int, directory: Path = Path("data/evaluation/embedded-exports"),
+                    kind: str = "view/json"):
+    """Save a bounded archive-index search for literal HTML JSON exports."""
+    from .archived_exports import discover_exports
+    with httpx.Client(timeout=45, follow_redirects=False) as client:
+        report = discover_exports(directory, year, client, kind=kind)
+    typer.echo(json.dumps({k: v for k, v in report.items() if k != "index"}, indent=2))
+
+
+@app.command()
+def export_acquire(discovery: Path, directory: Path = Path("data/evaluation/embedded-exports"),
+                   private_research: bool = False):
+    """Acquire in-season HTML exports from a saved discovery; retain all failures."""
+    from .archived_exports import ORIGIN, RESULT_ORIGIN, acquire_export
+    from .capture_inventory import TERMS, save
+    from .result_sources import sha256
+    if not private_research:
+        raise typer.BadParameter("Private non-commercial research scope required")
+    receipt = json.loads(discovery.read_text())
+    if receipt.get("error") or receipt.get("rows", 2000) >= 2000:
+        raise typer.BadParameter("Complete successful discovery required")
+    index = receipt["index"]
+    encoded = (discovery.parent/receipt["response_path"]).read_bytes()
+    if sha256(encoded) != receipt["response_sha256"] or json.loads(encoded) != index:
+        raise typer.BadParameter("Discovery response integrity mismatch")
+    selected, captures, failures = [], [], []
+    for values in index[1:]:
+        row = dict(zip(index[0], values, strict=True))
+        match = ORIGIN.fullmatch(row["original"]) or RESULT_ORIGIN.fullmatch(row["original"])
+        if not match:
+            continue
+        year = int(match[1])
+        if max(f"{year}1001000000", "20230101000000") <= row["timestamp"] < f"{year+1}0416000000":
+            selected.append(row)
+    with httpx.Client(timeout=45, follow_redirects=False) as client:
+        terms = client.get(TERMS)
+        terms.raise_for_status()
+        if b"personal and non-commercial" not in terms.content:
+            raise typer.BadParameter("Source use terms require review before download")
+        for row in selected:
+            try:
+                snapshot = acquire_export(directory, row, index, terms.content, client)
+                captures.append(snapshot["receipt_path"])
+            except (ValueError, KeyError, TypeError, httpx.HTTPError) as exc:
+                failures.append({"cdx": row, "error": str(exc)})
+    report = {"discovery_sha256": sha256(discovery.read_bytes()), "captures": captures,
+              "failures": failures, "private_noncommercial": True,
+              "selection_rule": "All indexed captures Oct1 through Apr15 of source season"}
+    report["report_path"] = save(directory, "acquisition.json", report)
+    typer.echo(json.dumps(report, indent=2))
+
+
+@app.command()
+def export_capacity(directory: Path = Path("data/evaluation/embedded-exports"),
+                    feed_inventory: Path | None = None):
+    """Reverify private source bytes, then audit causal capacity without target outcomes."""
+    from . import archived_exports
+    from .archived_exports import history_capacity, load_export, load_feed_inventory
+    from .capture_inventory import save
+    from .result_sources import sha256
+    receipts = sorted(directory.glob("*.capture-receipt.json"))
+    if not receipts:
+        raise typer.BadParameter("No acquired source receipts")
+    snapshots = [load_export(directory, path) for path in receipts]
+    if feed_inventory is not None:
+        snapshots.extend(load_feed_inventory(feed_inventory.parent, feed_inventory))
+    report = history_capacity(snapshots)
+    if feed_inventory is not None:
+        report["feed_inventory_sha256"] = sha256(feed_inventory.read_bytes())
+    from .season_audit import load_contract
+    report["season_contract_sha256"] = sha256(json.dumps(load_contract(), sort_keys=True).encode())
+    report["capture_receipts_sha256"] = {p.name: sha256(p.read_bytes()) for p in receipts}
+    report["evaluator_sha256"] = sha256(Path(archived_exports.__file__).read_bytes())
+    path = save(directory, "verified-capacity.json", report)
+    typer.echo(json.dumps({"report": str(directory/path),
+                          "captures": len(snapshots),
+                          **{k: v for k, v in report.items() if k not in
+                             ("excluded", "candidates_with_history", "capture_receipts_sha256")}}, indent=2))
+
+
+@app.command()
+def temporal_lock(feed_inventory: Path, directory: Path = Path("data/evaluation/embedded-exports"),
+                  output: Path = Path("data/evaluation/temporal-v1")):
+    """Lock calendar strata, methods and source receipts without loading outcomes."""
+    from .temporal_evaluation import lock_plan
+    path = lock_plan(directory, feed_inventory, output)
+    typer.echo(json.dumps({"locked_plan": str(path)}, indent=2))
+
+
+@app.command()
+def temporal_evaluate(plan: Path, manifest: Path,
+                      directory: Path = Path("data/evaluation/embedded-exports"),
+                      output: Path = Path("data/evaluation/temporal-v1"),
+                      result_root: Path = Path("data/results")):
+    """Freeze forecasts first, then corroborate sources and assess identical cohorts."""
+    from .temporal_evaluation import run_locked
+    path, report = run_locked(plan, directory, manifest, output, result_root)
+    typer.echo(json.dumps({"report": str(path), "status": report["status"],
+                          "forecasts": report["forecast_count"],
+                          "scored": report["source_admitted_games"],
+                          "model": report["model_metrics"], "baseline": report["benchmark_metrics"],
+                          "period_counts": report["period_counts"],
+                          "paired_analysis": report["paired_analysis"],
+                          "planning_target_met": report["planning_target_met_after_source_admission"],
+                          "production_ready": False}, indent=2))

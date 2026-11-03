@@ -56,3 +56,9 @@ CLI reports include hashes of all three input files and the evaluator source.
 The first outcome-blind [capture inventory](capture-inventory.md) is implemented.
 Its schedule candidates do not yet have compatible admitted score history;
 period selection and new evaluation therefore remain blocked.
+
+Update 2026-11-03: the [locked temporal reconstruction](temporal-evaluation.md)
+completed a new 298-game research assessment across three calendar strata. Its
+planning and primary uncertainty gates remain unmet; it is not production
+validation. The earlier zero-capacity inventory was limited to CSV score captures
+and has been supplemented by verified literal HTML exports and result tables.

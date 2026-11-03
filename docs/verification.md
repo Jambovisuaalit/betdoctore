@@ -58,3 +58,28 @@ coverage and real-data reproducibility remain unverified. Production readiness i
 Inspect the current draft PR checks for PostgreSQL and container verification on the final head.
 The real assessment is a limited retrospective score-only baseline, not prospective validation,
 calibration, profitability evidence or production acceptance.
+
+## New temporal source-backed research run, 2026-11-03
+
+The [locked temporal assessment](temporal-evaluation.md) reverified 142 private
+historical captures and froze 402 forecasts before opening the adjudication
+manifest. 298 games across three strata passed all fixed source/result/history
+checks. Model and comparator used identical games and T-60 cutoffs. 102 forecasts
+failed used-history quality and two failed target identity/schedule checks.
+The 300-game planning target and primary seven-day uncertainty support gate
+remain unmet. The three-day sensitivity interval is exploratory only.
+
+Source/feature tests include original HTML and JSON digests, literal-only parsing,
+explicit UTC display evidence, no invented table provider IDs, cutoff/future-data
+rejection, replay receipt tampering, ambiguous identity quarantine, NBA Cup-final
+exclusion, 2023 captures of the 2022–23 season without reusing 2022 test games,
+locked code/cohort drift rejection and durable forecast writes before outcome
+opening. Detailed reports and the exposure registry stay private. No advanced
+rows or real odds were promoted; model and betting-edge validation remain open.
+
+The measured source revision is 034abdbe4e273657cd9139928de918304246ad09.
+Its exact locked replay produced identical prediction and evaluation hashes;
+wheel packaging includes both new evaluators and the protocol resource. After
+preserving the concurrently added research tools, the integrated suite passes
+221 tests and Ruff. Exact private-report replay uses the measured revision;
+the lock intentionally rejects a changed package file inventory.
