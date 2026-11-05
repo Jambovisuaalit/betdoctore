@@ -79,3 +79,10 @@ follow-up fixes. Market imports now require an explicit overtime rule; `/ready` 
 supported schema; fixed-model backtests skip targets before the training boundary. CLI `status`
 reports documented research milestones, not a live readiness audit. For local editable-import
 issues, see [installation troubleshooting](docs/operations.md#local-editable-install-troubleshooting).
+
+
+The four reviewed conflicts now have a [verified ground-truth overlay](docs/result-adjudication.md)
+that retains dissenting observations and cannot replace historical features. The
+[next independent sample inventory](docs/next-independent-sample.md) preserves 2025–2026
+schedule evidence but currently lacks sufficient fresh score history. The new sample is
+not locked and no new performance result is claimed.

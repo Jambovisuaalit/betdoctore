@@ -34,9 +34,10 @@ Neil Paine results; repeated FixtureDownload captures are one publisher.
 This decision resolves the reviewed score conflict for ground-truth review only.
 It does not modify source observations, the regular-season manifest, frozen
 forecasts or the frozen 298-game assessment. Existing feature conflict exclusions
-remain in place. Integration into a future manifest requires an explicit
-adjudication-aware verifier that retains dissenting observations and source lineage.
-Do not mark the original observations mutually consistent.
+remain in place. The new `result_adjudication` overlay verifies the reviewed decision hash, the retained
+official representations, and each original result observation through the existing byte verifier.
+It retains the complete original quarantined entry and separate accepted/dissenting references.
+It never marks the original observations mutually consistent.
 
 Current official pages and their stated publication dates do not prove historical
 T−60 availability. Do not replace historical observed scores with these corrected
@@ -44,3 +45,25 @@ values as if the correction were known before prediction. Any revised assessment
 must preserve the original exposure registry and be labeled as a revision, not a
 new independent test. Longer temporal coverage, advanced source admission,
 betting-edge validation and production approval remain open.
+
+
+## Verified overlay
+
+```sh
+betdoctore adjudicate-results \
+  data/regular-season/6a9e71de8d2edb51509a6d48258d5d871c00103828c3c7a45e3ae29d97d5cfc8.regular-manifest.json \
+  data/evaluation/primary-result-evidence/e1a5f89b076440585f4d31c8e05de6afeacd482dc6119b61b43d111c0affd060.result-adjudication.json
+```
+
+The actual private overlay is
+`5d8c9b9d71696a2b879ec62cf8bdc487f324d74c8d60b0f4c83ea74e03545181.adjudication-layer.json`
+under `data/regular-season/adjudication/`. It resolves exactly the four reviewed ground-truth
+scores. Isolated score conflicts are supported; identity/home conflicts fail closed.
+`betdoctore adjudicated-result GAME_KEY LAYER MANIFEST DECISION` rebuilds and verifies the
+layer before returning a result. A changed official file, decision, original source row, layer,
+or parent manifest causes rejection. Historical-feature use is explicitly rejected.
+
+The old evaluator and `target_gate` are unchanged. Neither automatically reads this overlay,
+and the old 102 feature-quality exclusions remain in place. Any future evaluator that opts
+into adjudicated ground truth must bind the overlay hash in its own protocol; it may not use
+corrected values as historical inputs without separate availability evidence.

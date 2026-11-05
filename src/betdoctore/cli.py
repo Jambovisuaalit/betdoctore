@@ -436,3 +436,33 @@ def temporal_evaluate(plan: Path, manifest: Path,
                           "paired_analysis": report["paired_analysis"],
                           "planning_target_met": report["planning_target_met_after_source_admission"],
                           "production_ready": False}, indent=2))
+
+
+@app.command()
+def adjudicate_results(manifest: Path, decision: Path,
+                       evidence: Path = Path('data/evaluation/primary-result-evidence'),
+                       result_root: Path = Path('data/results'),
+                       output: Path = Path('data/regular-season/adjudication')):
+    """Append a verified ground-truth layer; never revise frozen historical features."""
+    from .result_adjudication import persist_layer
+    typer.echo(str(persist_layer(manifest, decision, evidence, result_root, output)))
+
+
+@app.command()
+def adjudicated_result(game_key: str, layer: Path, manifest: Path, decision: Path,
+                       evidence: Path = Path('data/evaluation/primary-result-evidence'),
+                       result_root: Path = Path('data/results')):
+    """Read one adjudicated result after reverifying the complete private source chain."""
+    from .result_adjudication import ground_truth, load_layer
+    typer.echo(json.dumps(ground_truth(load_layer(layer, manifest, decision, evidence, result_root),
+                                      game_key)))
+
+
+@app.command()
+def independent_capacity(directory: Path, exposure_registry: Path, periods: Path,
+                         output: Path = Path('data/evaluation/next-independent-sample')):
+    """Preview fresh source capacity, excluding all previously exposed forecast games."""
+    from .capture_inventory import save
+    from .independent_sample import inventory_preview
+    report = inventory_preview(directory, exposure_registry, json.loads(periods.read_text()))
+    typer.echo(str(output / save(output, 'independent-capacity.json', report)))

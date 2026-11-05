@@ -101,3 +101,21 @@ the lock intentionally rejects a changed package file inventory.
 - PostgreSQL, Docker and GitHub CI for this remediation revision were not run locally.
   Production readiness remains blocked. Frozen historical predictions and results were
   not modified; exact historical replay continues to require its measured revision.
+
+
+## Published remediation and adjudication follow-up — 2026-11-05
+
+The remediation tree was published through the authenticated GitHub connector as
+47bffeac3ad22c92ce88b0e0d9c57990f1beb5e0, preserving the previous remote parent and
+without force-pushing. Its tree exactly matches local 5fb177a; the original local
+commit chain remains on codex/local-audit-history-20261105.
+[CI run 42078389259](https://github.com/Jambovisuaalit/betdoctore/actions/runs/42078389259)
+passed installation, Ruff, PostgreSQL migrations/tests, synthetic reporting and Docker
+Compose/API smoke. This is software verification, not production or model approval.
+
+The subsequent adjudication overlay reverifies the approved decision, retained official
+representations and all original result observations. The actual four-game overlay was
+formed and read back successfully. New independent-sample capacity is zero with the newly
+acquired two captures; the full exposure registry and 2022 exclusion remain enforced.
+These subsequent code additions require their own CI result, separate from the run above.
+See result-adjudication.md and next-independent-sample.md.
