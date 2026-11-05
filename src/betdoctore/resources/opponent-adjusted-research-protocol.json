@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "id": "opponent-adjusted-total-score-hypotheses-v1",
+  "status": "DRAFT_BLOCKED_UNTIL_POINT_IN_TIME_DATA_ADMISSION",
+  "reference_paper": {
+    "citation": "Zhao, Du & Tan (2023), Entropy 25(5), 765",
+    "doi": "10.3390/e25050765",
+    "published_target": "NBA winner classification",
+    "reported_accuracy_percent": 71.54,
+    "applicability_to_totals": "HYPOTHESIS_ONLY"
+  },
+  "target": "nba_regular_full_game_total_including_overtime",
+  "evaluation": {
+    "initial_2022_cohort": "EXPLORATORY_ONLY_EXCLUDED_FROM_NEW_HOLDOUT",
+    "min_distinct_periods": 2,
+    "planning_min_games": 300,
+    "planning_target_is_statistical_guarantee": false,
+    "split": "strictly_chronological_walk_forward",
+    "selection": "freeze_before_target_outcomes",
+    "same_cohort_and_cutoffs_for_all_candidates": true,
+    "no_silent_intersection": true,
+    "cutoff_minutes_before_archived_scheduled_tipoff": 60,
+    "actual_tipoff_verified": false,
+    "seven_day_history_age_max": 7,
+    "validation_fit_only_training_side": true,
+    "bootstrap_block_days": [
+      3,
+      7,
+      14
+    ],
+    "primary_metric": "paired_mae_difference",
+    "secondary_metrics": [
+      "rmse",
+      "mean_error",
+      "mae_per_period"
+    ],
+    "further_requirements": [
+      "historical_source_license_review",
+      "historical_schedule_and_score_capture_proof",
+      "score_history_after_final_only",
+      "independent_source_lineage_review"
+    ]
+  },
+  "features": {
+    "score_only_candidate": [
+      "home_team_rolling_points_for",
+      "away_team_rolling_points_for",
+      "home_team_rolling_points_against",
+      "away_team_rolling_points_against",
+      "opponent_adjusted_rolling_points_for",
+      "opponent_adjusted_rolling_points_against",
+      "league_scoring_baseline",
+      "home_away_indicator",
+      "rest_days",
+      "back_to_back"
+    ],
+    "advanced_after_separate_approval": [
+      "pace",
+      "offensive_rating",
+      "defensive_rating",
+      "effective_field_goal_percentage",
+      "turnover_rate",
+      "offensive_rebound_rate"
+    ],
+    "prohibited_as_prediction_inputs": [
+      "target_game_final_score",
+      "target_game_efficiency_differential",
+      "target_game_points",
+      "target_game_pace",
+      "target_game_offensive_rating",
+      "target_game_defensive_rating",
+      "target_game_field_goal_percentage",
+      "future_game_result",
+      "future_graph_edges",
+      "future_lineups",
+      "post_cutoff_injury_update"
+    ],
+    "availability_rule": "All observed source and model-fit timestamps must be <= target published-schedule T-60; no target-game or future-game features",
+    "opponent_adjustment": "Estimate opponent-specific historical strength using only verified past-game data observable at each target cutoff; avoid treating point totals as ORtg/DRtg without possessions"
+  },
+  "candidates": [
+    {
+      "id": "m0",
+      "method": "league_last100_fullgame_total_mean",
+      "role": "existing_baseline",
+      "advanced_required": false
+    },
+    {
+      "id": "m1",
+      "method": "team_last10_fullgame_total_mean",
+      "role": "existing_baseline",
+      "advanced_required": false
+    },
+    {
+      "id": "m2",
+      "method": "opponent_adjusted_regularized_linear",
+      "role": "first_new_hypothesis",
+      "advanced_required": false
+    },
+    {
+      "id": "m3",
+      "method": "opponent_adjusted_random_forest_regressor",
+      "role": "second_new_hypothesis",
+      "advanced_required": false
+    },
+    {
+      "id": "m4",
+      "method": "temporal_graph_convolution_regressor",
+      "role": "DEFERRED_ABLATION_ONLY",
+      "advanced_required": true,
+      "allowed_only_after": "m2_m3_out_of_time_gain_and_GCN_point_in_time_graph_evidence"
+    }
+  ],
+  "anti_leakage": {
+    "allow_edges_at_or_before_cutoff_only": true,
+    "training_only_preprocessing_and_feature_selection": true,
+    "no_random_train_test_split": true,
+    "forbid_target_game_box_score_features": true,
+    "outcome_manifest_not_read_before_prediction_freeze": true,
+    "do_not_auto_promote_advanced_stage": true,
+    "never_auto_unlock_training": true
+  },
+  "gates": {
+    "new_source_admitted": false,
+    "independent_new_holdout_admitted": false,
+    "advanced_features_admitted": false,
+    "gcn_approved": false,
+    "production_ready": false,
+    "real_new_model_training_authorized": false
+  }
+}

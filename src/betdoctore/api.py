@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from .config import Configuration
-from .storage import Snapshot
+from .storage import SUPPORTED_SCHEMA_REVISION, Base, Snapshot
 
 app = FastAPI(title="BetDoctore", version="0.1.0")
 
@@ -17,12 +17,21 @@ def health():
 
 @app.get("/ready")
 def ready():
+    engine = create_engine(Configuration().database_url)
     try:
-        with create_engine(Configuration().database_url).connect() as connection:
-            connection.execute(text("SELECT digest FROM feature_snapshots LIMIT 1"))
+        with engine.connect() as connection:
+            revisions = set(connection.execute(text("SELECT version_num FROM alembic_version"))
+                            .scalars())
+            if revisions != {SUPPORTED_SCHEMA_REVISION}:
+                raise HTTPException(503, "Database schema revision unsupported")
+            for table in Base.metadata.sorted_tables:
+                connection.execute(select(table).limit(0))
     except SQLAlchemyError:
         raise HTTPException(503, "Database unavailable or migrations missing") from None
-    return {"database": "ready", "production_ready": False}
+    finally:
+        engine.dispose()
+    return {"database": "ready", "schema_revision": SUPPORTED_SCHEMA_REVISION,
+            "production_ready": False}
 
 
 @app.get("/snapshots/{game_id}")

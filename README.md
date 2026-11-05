@@ -37,13 +37,15 @@ See [verification evidence](docs/verification.md) for what was actually checked.
 
 | Gate | Status |
 | --- | --- |
-| CODE_READY | Baseline implemented; verification evidence linked above |
-| DATA_READY | BLOCKED — licensed historical inputs and integrity audit missing |
-| BACKTEST_READY | Synthetic workflow verified; real-data evaluation BLOCKED |
+| CODE_READY | Research baseline verified locally; release CI must be checked |
+| DATA_READY | PARTIAL — curated regular cohorts; unresolved rows remain quarantined |
+| FORECAST_EVALUATION_READY | 298 real games across three strata; primary uncertainty gate remains blocked |
+| BETTING_BACKTEST_READY | BLOCKED — real odds and calibrated betting evaluation unverified |
 | PRODUCTION_READY | NO — real-data calibration, reproducibility and backtesting unverified |
 
-All bundled fixtures are explicitly synthetic. No real historical odds, accuracy, profitability
-or calibration claims are made. The optional CatBoost residual extension is deferred.
+All bundled fixtures are explicitly synthetic. Measured real score-only research results are
+documented separately; no calibrated production accuracy, historical betting profitability
+or betting-edge claims are made. The optional CatBoost residual extension is deferred.
 
 ## Real results foundation
 
@@ -58,3 +60,29 @@ The [technical result foundation is accepted](docs/acceptance.md). The separate
 [season/availability audit](docs/season-availability.md) checks season boundaries, Cup-final
 exclusions, playoff series counts and checksum-verified public archive captures. It preserves
 local receipt times and keeps the Pace/ORTG/DRTG join blocked pending the remaining evidence.
+
+## V1 parallel work
+
+[Regular-season curation](docs/regular-season.md) and [advanced staging](docs/advanced-staging.md)
+proceed independently of the postseason backlog. The [first real score-only assessment](docs/regular-evaluation.md)
+uses archived pregame schedules and causal result history; detailed private reports stay local.
+Staged advanced rows are never automatically promoted, and missing playoffs do not veto a clean
+regular evaluation cohort.
+
+The [new locked temporal assessment](docs/temporal-evaluation.md) evaluated 298 of 402
+frozen forecasts. The 300-game planning target and primary uncertainty gate remain unmet;
+this does not approve a production model or betting edge.
+
+
+The [5 November audit](docs/audits/2026-11-05-current-state.md) records the findings and
+follow-up fixes. Market imports now require an explicit overtime rule; `/ready` verifies the
+supported schema; fixed-model backtests skip targets before the training boundary. CLI `status`
+reports documented research milestones, not a live readiness audit. For local editable-import
+issues, see [installation troubleshooting](docs/operations.md#local-editable-install-troubleshooting).
+
+
+The four reviewed conflicts now have a [verified ground-truth overlay](docs/result-adjudication.md)
+that retains dissenting observations and cannot replace historical features. The
+[next independent sample inventory](docs/next-independent-sample.md) preserves 2025–2026
+schedule evidence but currently lacks sufficient fresh score history. The new sample is
+not locked and no new performance result is claimed.

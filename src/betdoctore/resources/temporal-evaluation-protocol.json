@@ -1,0 +1,35 @@
+{
+  "protocol_id": "new-temporal-score-only-v1",
+  "synthetic": false,
+  "scope": "private_noncommercial",
+  "planning_minimum_games": 300,
+  "planning_minimum_periods": 2,
+  "planning_target_is_significance_guarantee": false,
+  "prediction_cutoff_minutes": 60,
+  "maximum_history_capture_age_days": 7,
+  "minimum_team_history": 5,
+  "team_window": 10,
+  "league_window": 100,
+  "model": "team-last10-fullgame-total-mean",
+  "benchmark": "league-last100-fullgame-total-mean",
+  "target": "full_game_total_including_overtime",
+  "periods": [
+    {"start": "2023-01-01", "end": "2023-06-30"},
+    {"start": "2023-07-01", "end": "2024-06-30"},
+    {"start": "2024-07-01", "end": "2025-06-30"}
+  ],
+  "selection": "All source-capacity candidates in the three predeclared calendar strata; source inventory fixed in local lock artifact before scoring. No performance-based selection.",
+  "excluded_test_calendar_years": [2022],
+  "excluded_capture_calendar_years": [2022],
+  "input_policy": "Original byte-verified captured scores, previous New York calendar day or earlier, same NBA season, captured by cutoff and at most seven days old. Exclude NBA Cup finals, contradictory captured histories and pre-cutoff target schedule revisions. All USED team/league input scores must corroborate against byte-revalidated regular results after predictions have been frozen; no retrospective corrections.",
+  "post_freeze_exclusions": [
+    "unverified or inconsistent regular target identity or result",
+    "target schedule or home disagrees with archived schedule",
+    "any used historical input lacks corroborated regular result",
+    "any used historical input score or home identity disagrees with verified final result"
+  ],
+  "bootstrap": {"block_days": 7, "sensitivity_block_days": [3, 14], "repetitions": 2000, "seed": 20261027},
+  "uncertainty_scope": "Captured cohort only; calendar strata include empty days across source gaps. Uneven archive coverage prevents claims of representative full-season performance. No significance or betting-edge guarantee.",
+  "advanced_features": false,
+  "production_ready": false
+}

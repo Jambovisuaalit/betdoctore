@@ -59,3 +59,13 @@ data-use rights. Accordingly `historical_t60_verified=false` and
 
 No new production API ingestion, backdated availability times,
 model training, deployment, or PR merge permitted.
+
+## Parallel V1 research assessment
+
+The user authorized a separate score-only regular-season baseline while advanced staging proceeds.
+That [assessment](regular-evaluation.md) reconstructs a cutoff against an actually captured
+published schedule and only uses score history already public before the declared cutoff.
+It explicitly does not certify actual tipoff timestamps, advanced/injury/odds readiness, this
+module's full-feature gate, production training, deployment or a prospective untouched test.
+The full advanced betting-model evidence inventory above remains blocked. Its missing playoff
+or unrelated-feature inputs do not veto a separately labeled research baseline cohort.

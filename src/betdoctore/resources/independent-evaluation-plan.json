@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "status": "DRAFT_AWAITING_NEW_CAPTURE_ADMISSION",
+  "planning_minimum_games": 300,
+  "planning_minimum_periods": 2,
+  "planning_target_is_significance_guarantee": false,
+  "periods": [],
+  "excluded_development_calendar_years": [2022],
+  "required_cutoff_minutes_before_tipoff": 60,
+  "new_sample_requires_own_timestamped_source_captures": true,
+  "freeze_periods_models_and_capture_inventory_before_outcome_review": true,
+  "comparison_requires_identical_games_cutoffs_and_outcomes": true,
+  "paired_error": "abs(model-actual) - abs(baseline-actual)",
+  "bootstrap": {"block_days": 7, "sensitivity_block_days": [3, 14], "repetitions": 2000, "seed": 20261027},
+  "advanced_required_checks": ["source", "metric_definition", "historical_availability", "both_teams", "T-60_cutoff"],
+  "production_requires_separate_model_and_betting_edge_validation": true,
+  "new_independent_sample_admission": "BLOCKED_NO_NEW_VERIFIED_CAPTURE_INVENTORY"
+}

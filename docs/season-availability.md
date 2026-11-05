@@ -94,3 +94,11 @@ Pace/ORTG/DRTG value. No model performance or real-data profitability is compute
 quarantine resolution and the relevant field-level availability evidence are reviewed and pass.
 The advanced source must additionally provide its own version/publication history; availability
 of a final score never proves availability of subsequently corrected efficiency statistics.
+
+## V1 dependency update — 2026-10-27
+
+The user subsequently authorized cohort-scoped regular evaluation and advanced staging in parallel.
+This global full-history audit remains diagnostic. Its unresolved playoff rows do not veto an
+individually verified V1 regular cohort. The [regular manifest](regular-season.md) owns separate
+quality/history/postseason queues; the [evaluation protocol](regular-evaluation.md) independently
+verifies its historical fixture and score inputs. Advanced staging remains isolated from features.

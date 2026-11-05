@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated
 
+import httpx
 import pandas as pd
 import typer
 from sqlalchemy import create_engine
@@ -57,8 +58,17 @@ def backtest(games: Path, odds: Path, artifact: Path, output: Path = Path("repor
 
 @app.command()
 def status():
-    typer.echo(json.dumps({"CODE_READY": "verification required", "DATA_READY": "BLOCKED",
-                           "BACKTEST_READY": "synthetic only", "PRODUCTION_READY": False}))
+    typer.echo(json.dumps({
+        "status_basis": "documented research milestones; not a live data or CI audit",
+        "CODE_READY": "research baseline; release verification required",
+        "DATA_READY": "PARTIAL: basic results; coverage and historical availability open",
+        "FORECAST_EVALUATION_READY": "298-game reproducible score-only research assessment; "
+                                     "independent validation blocked",
+        "BACKTEST_READY": "BLOCKED: real odds and betting-edge validation unavailable",
+        "synthetic_backtest_verified": True,
+        "advanced_data_approved": False,
+        "PRODUCTION_READY": False,
+    }))
 
 
 @app.command()
@@ -218,3 +228,241 @@ def reference_bdl_acquire(
     from .bdl_reference import run
 
     typer.echo(json.dumps(run(output, execute, start_year, end_year, max_requests), indent=2))
+
+
+@app.command()
+def regular_manifest(root: Path = Path("data/results"), captures: Path = Path("data/availability/wayback"),
+                     as_of: str = "2026-10-27", output: Path = Path("data/regular-season")):
+    """Curate regular targets; keep postseason in its own nonblocking queue."""
+    from datetime import date
+
+    from .historical_availability import capture_evidence, load_capture_index
+    from .regular_season import build_regular_manifest, save_regular_manifest
+    from .season_audit import load_contract, load_full_sources
+    records, schedules, _ = load_full_sources(root,date.fromisoformat(as_of))
+    earliest, _ = capture_evidence(captures,load_capture_index(captures))
+    manifest = build_regular_manifest(records,schedules,load_contract(),date.fromisoformat(as_of),earliest)
+    path = save_regular_manifest(manifest,output)
+    typer.echo(json.dumps({"manifest":str(path),"regular_games":manifest["regular_catalog_games"],
+                          "consistent":manifest["consistent_result_games"],
+                          "quarantined":manifest["quarantined_regular_games"]},indent=2))
+
+
+@app.command()
+def regular_evaluation_acquire(directory: Path = Path("data/evaluation/schedule-captures"),
+                               private_research: bool = False):
+    """Acquire the pinned historical schedules for the private baseline assessment."""
+    from .regular_evaluation import acquire_schedule_captures
+    if not private_research:
+        raise typer.BadParameter("Personal non-commercial scope requires --private-research")
+    typer.echo(json.dumps(acquire_schedule_captures(directory),indent=2))
+
+
+@app.command()
+def regular_evaluate(manifest: Path, history: Path = Path("data/availability/wayback"),
+                     schedules: Path = Path("data/evaluation/schedule-captures"),
+                     output: Path = Path("data/evaluation/real-regular-v1"),
+                     result_root: Path = Path("data/results")):
+    """Freeze causal score-only forecasts, then assess the exact real regular cohort."""
+    from .regular_evaluation import run_evaluation
+    path,result = run_evaluation(history,schedules,manifest,output,result_root)
+    typer.echo(json.dumps({"report":str(path),"status":result["status"],
+                          "model":result["model_metrics"],"benchmark":result["benchmark_metrics"]},indent=2))
+
+
+@app.command()
+def advanced_stage(manifest: Path, rows: Path, raw_source: Path | None = None):
+    """Append an isolated advanced-data batch; incomplete evidence remains quarantined."""
+    from .advanced_staging import AdvancedSourceManifest, stage_batch
+    source = AdvancedSourceManifest.model_validate_json(manifest.read_text())
+    with Session(create_engine(Configuration().database_url)) as session:
+        report = stage_batch(session,source,json.loads(rows.read_text()),
+                             source_bytes=raw_source.read_bytes() if raw_source else None)
+        session.commit()
+    typer.echo(json.dumps(report,indent=2))
+
+
+@app.command()
+def advanced_readiness(batch: str, curated_keys: Path, manifest: Path,
+                       cutoff: Annotated[datetime,typer.Argument(formats=["%Y-%m-%dT%H:%M:%S%z"])],
+                       prediction_tipoff: Annotated[datetime,typer.Argument(formats=["%Y-%m-%dT%H:%M:%S%z"])]):
+    """Assess a selected regular subset; this command never promotes staged rows."""
+    from .advanced_staging import readiness_report
+    from .regular_season import target_gate
+    keys = set(json.loads(curated_keys.read_text()))
+    regular = json.loads(manifest.read_text())
+    if not keys or any(not target_gate(regular,key)["passed"] for key in keys):
+        raise typer.BadParameter("Each selected game must pass the explicit regular result gate")
+    with Session(create_engine(Configuration().database_url)) as session:
+        report = readiness_report(session,batch,cutoff,keys,prediction_tipoff,
+                                  normalization_verified=False,real_evaluation=True)
+    typer.echo(json.dumps(report,indent=2))
+
+
+@app.command()
+def paired_evaluate(model: Path, baseline: Path, periods: Path,
+                    block_days: int = 7, repetitions: int = 2000):
+    """Analyze paired forecast JSON arrays; does not admit sources or approve a model."""
+    from .paired_evaluation import compare
+    report = compare(json.loads(model.read_text()), json.loads(baseline.read_text()),
+                     json.loads(periods.read_text()), block_days=block_days,
+                     repetitions=repetitions)
+    from . import paired_evaluation
+    from .result_sources import sha256
+    report["input_sha256"] = {"model": sha256(model.read_bytes()),
+                              "baseline": sha256(baseline.read_bytes()),
+                              "periods": sha256(periods.read_bytes())}
+    report["evaluator_sha256"] = sha256(Path(paired_evaluation.__file__).read_bytes())
+    typer.echo(json.dumps(report, indent=2))
+
+
+@app.command()
+def capture_inventory(directory: Path = Path("data/evaluation/new-capture-inventory"),
+                      private_research: bool = False,
+                      history: Path = Path("data/availability/wayback")):
+    """Inventory new archived schedules; never locks periods or reads current outcomes."""
+    from .capture_inventory import acquire_inventory, inventory_history, save, temporal_support
+    report = acquire_inventory(directory, [2023, 2024, 2025], private_research=private_research)
+    report["score_history_captures"] = inventory_history(history)
+    report["temporal_support"] = temporal_support(report, report["score_history_captures"])
+    report["combined_inventory_path"] = save(directory, "combined-inventory.json", report)
+    typer.echo(json.dumps({key: value for key, value in report.items()
+                          if key not in ("captures", "queries")}, indent=2))
+
+
+@app.command()
+def export_discover(year: int, directory: Path = Path("data/evaluation/embedded-exports"),
+                    kind: str = "view/json"):
+    """Save a bounded archive-index search for literal HTML JSON exports."""
+    from .archived_exports import discover_exports
+    with httpx.Client(timeout=45, follow_redirects=False) as client:
+        report = discover_exports(directory, year, client, kind=kind)
+    typer.echo(json.dumps({k: v for k, v in report.items() if k != "index"}, indent=2))
+
+
+@app.command()
+def export_acquire(discovery: Path, directory: Path = Path("data/evaluation/embedded-exports"),
+                   private_research: bool = False):
+    """Acquire in-season HTML exports from a saved discovery; retain all failures."""
+    from .archived_exports import ORIGIN, RESULT_ORIGIN, acquire_export
+    from .capture_inventory import TERMS, save
+    from .result_sources import sha256
+    if not private_research:
+        raise typer.BadParameter("Private non-commercial research scope required")
+    receipt = json.loads(discovery.read_text())
+    if receipt.get("error") or receipt.get("rows", 2000) >= 2000:
+        raise typer.BadParameter("Complete successful discovery required")
+    index = receipt["index"]
+    encoded = (discovery.parent/receipt["response_path"]).read_bytes()
+    if sha256(encoded) != receipt["response_sha256"] or json.loads(encoded) != index:
+        raise typer.BadParameter("Discovery response integrity mismatch")
+    selected, captures, failures = [], [], []
+    for values in index[1:]:
+        row = dict(zip(index[0], values, strict=True))
+        match = ORIGIN.fullmatch(row["original"]) or RESULT_ORIGIN.fullmatch(row["original"])
+        if not match:
+            continue
+        year = int(match[1])
+        if max(f"{year}1001000000", "20230101000000") <= row["timestamp"] < f"{year+1}0416000000":
+            selected.append(row)
+    with httpx.Client(timeout=45, follow_redirects=False) as client:
+        terms = client.get(TERMS)
+        terms.raise_for_status()
+        if b"personal and non-commercial" not in terms.content:
+            raise typer.BadParameter("Source use terms require review before download")
+        for row in selected:
+            try:
+                snapshot = acquire_export(directory, row, index, terms.content, client)
+                captures.append(snapshot["receipt_path"])
+            except (ValueError, KeyError, TypeError, httpx.HTTPError) as exc:
+                failures.append({"cdx": row, "error": str(exc)})
+    report = {"discovery_sha256": sha256(discovery.read_bytes()), "captures": captures,
+              "failures": failures, "private_noncommercial": True,
+              "selection_rule": "All indexed captures Oct1 through Apr15 of source season"}
+    report["report_path"] = save(directory, "acquisition.json", report)
+    typer.echo(json.dumps(report, indent=2))
+
+
+@app.command()
+def export_capacity(directory: Path = Path("data/evaluation/embedded-exports"),
+                    feed_inventory: Path | None = None):
+    """Reverify private source bytes, then audit causal capacity without target outcomes."""
+    from . import archived_exports
+    from .archived_exports import history_capacity, load_export, load_feed_inventory
+    from .capture_inventory import save
+    from .result_sources import sha256
+    receipts = sorted(directory.glob("*.capture-receipt.json"))
+    if not receipts:
+        raise typer.BadParameter("No acquired source receipts")
+    snapshots = [load_export(directory, path) for path in receipts]
+    if feed_inventory is not None:
+        snapshots.extend(load_feed_inventory(feed_inventory.parent, feed_inventory))
+    report = history_capacity(snapshots)
+    if feed_inventory is not None:
+        report["feed_inventory_sha256"] = sha256(feed_inventory.read_bytes())
+    from .season_audit import load_contract
+    report["season_contract_sha256"] = sha256(json.dumps(load_contract(), sort_keys=True).encode())
+    report["capture_receipts_sha256"] = {p.name: sha256(p.read_bytes()) for p in receipts}
+    report["evaluator_sha256"] = sha256(Path(archived_exports.__file__).read_bytes())
+    path = save(directory, "verified-capacity.json", report)
+    typer.echo(json.dumps({"report": str(directory/path),
+                          "captures": len(snapshots),
+                          **{k: v for k, v in report.items() if k not in
+                             ("excluded", "candidates_with_history", "capture_receipts_sha256")}}, indent=2))
+
+
+@app.command()
+def temporal_lock(feed_inventory: Path, directory: Path = Path("data/evaluation/embedded-exports"),
+                  output: Path = Path("data/evaluation/temporal-v1")):
+    """Lock calendar strata, methods and source receipts without loading outcomes."""
+    from .temporal_evaluation import lock_plan
+    path = lock_plan(directory, feed_inventory, output)
+    typer.echo(json.dumps({"locked_plan": str(path)}, indent=2))
+
+
+@app.command()
+def temporal_evaluate(plan: Path, manifest: Path,
+                      directory: Path = Path("data/evaluation/embedded-exports"),
+                      output: Path = Path("data/evaluation/temporal-v1"),
+                      result_root: Path = Path("data/results")):
+    """Freeze forecasts first, then corroborate sources and assess identical cohorts."""
+    from .temporal_evaluation import run_locked
+    path, report = run_locked(plan, directory, manifest, output, result_root)
+    typer.echo(json.dumps({"report": str(path), "status": report["status"],
+                          "forecasts": report["forecast_count"],
+                          "scored": report["source_admitted_games"],
+                          "model": report["model_metrics"], "baseline": report["benchmark_metrics"],
+                          "period_counts": report["period_counts"],
+                          "paired_analysis": report["paired_analysis"],
+                          "planning_target_met": report["planning_target_met_after_source_admission"],
+                          "production_ready": False}, indent=2))
+
+
+@app.command()
+def adjudicate_results(manifest: Path, decision: Path,
+                       evidence: Path = Path('data/evaluation/primary-result-evidence'),
+                       result_root: Path = Path('data/results'),
+                       output: Path = Path('data/regular-season/adjudication')):
+    """Append a verified ground-truth layer; never revise frozen historical features."""
+    from .result_adjudication import persist_layer
+    typer.echo(str(persist_layer(manifest, decision, evidence, result_root, output)))
+
+
+@app.command()
+def adjudicated_result(game_key: str, layer: Path, manifest: Path, decision: Path,
+                       evidence: Path = Path('data/evaluation/primary-result-evidence'),
+                       result_root: Path = Path('data/results')):
+    """Read one adjudicated result after reverifying the complete private source chain."""
+    from .result_adjudication import ground_truth, load_layer
+    typer.echo(json.dumps(ground_truth(load_layer(layer, manifest, decision, evidence, result_root),
+                                      game_key)))
+
+
+@app.command()
+def independent_capacity(directory: Path, exposure_registry: Path, periods: Path,
+                         output: Path = Path('data/evaluation/next-independent-sample')):
+    """Preview fresh source capacity, excluding all previously exposed forecast games."""
+    from .capture_inventory import save
+    from .independent_sample import inventory_preview
+    report = inventory_preview(directory, exposure_registry, json.loads(periods.read_text()))
+    typer.echo(str(output / save(output, 'independent-capacity.json', report)))
