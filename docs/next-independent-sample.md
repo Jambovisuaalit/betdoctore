@@ -78,3 +78,11 @@ exposed cohort. Only after source and temporal support gates pass may the protoc
 be locked, both forecasts frozen before reading target outcomes, and paired MAE/RMSE with
 calendar-block uncertainty evaluated. Advanced comparison and betting-edge validation remain
 separately blocked.
+
+## Whole-league source follow-up, 2026-11-05
+
+[Two historical Kaggle Games.csv pilots](multiteam-history-source-review.md) have now been
+retained and structurally audited in separate private quarantine. They cover all 30 current
+teams but are not part of the admitted source inventory above. File creation times are not
+yet public-availability proof; a score revision and 135 five-hour date-time shifts require
+review. No new sample has been locked and no additional model metrics have been computed.
