@@ -37,7 +37,7 @@ See [verification evidence](docs/verification.md) for what was actually checked.
 
 | Gate | Status |
 | --- | --- |
-| CODE_READY | Baseline implemented; verification evidence linked above |
+| CODE_READY | Research baseline verified locally; release CI must be checked |
 | DATA_READY | PARTIAL — curated regular cohorts; unresolved rows remain quarantined |
 | FORECAST_EVALUATION_READY | 298 real games across three strata; primary uncertainty gate remains blocked |
 | BETTING_BACKTEST_READY | BLOCKED — real odds and calibrated betting evaluation unverified |
@@ -72,3 +72,10 @@ regular evaluation cohort.
 The [new locked temporal assessment](docs/temporal-evaluation.md) evaluated 298 of 402
 frozen forecasts. The 300-game planning target and primary uncertainty gate remain unmet;
 this does not approve a production model or betting edge.
+
+
+The [5 November audit](docs/audits/2026-11-05-current-state.md) records the findings and
+follow-up fixes. Market imports now require an explicit overtime rule; `/ready` verifies the
+supported schema; fixed-model backtests skip targets before the training boundary. CLI `status`
+reports documented research milestones, not a live readiness audit. For local editable-import
+issues, see [installation troubleshooting](docs/operations.md#local-editable-install-troubleshooting).

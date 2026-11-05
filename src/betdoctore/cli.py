@@ -58,8 +58,17 @@ def backtest(games: Path, odds: Path, artifact: Path, output: Path = Path("repor
 
 @app.command()
 def status():
-    typer.echo(json.dumps({"CODE_READY": "verification required", "DATA_READY": "BLOCKED",
-                           "BACKTEST_READY": "synthetic only", "PRODUCTION_READY": False}))
+    typer.echo(json.dumps({
+        "status_basis": "documented research milestones; not a live data or CI audit",
+        "CODE_READY": "research baseline; release verification required",
+        "DATA_READY": "PARTIAL: basic results; coverage and historical availability open",
+        "FORECAST_EVALUATION_READY": "298-game reproducible score-only research assessment; "
+                                     "independent validation blocked",
+        "BACKTEST_READY": "BLOCKED: real odds and betting-edge validation unavailable",
+        "synthetic_backtest_verified": True,
+        "advanced_data_approved": False,
+        "PRODUCTION_READY": False,
+    }))
 
 
 @app.command()

@@ -50,7 +50,7 @@ class Odds(Record):
     line: float = Field(gt=0)
     over: float = Field(gt=1)
     under: float = Field(gt=1)
-    includes_overtime: bool = True
+    includes_overtime: bool
 
     @model_validator(mode="after")
     def grid(self):

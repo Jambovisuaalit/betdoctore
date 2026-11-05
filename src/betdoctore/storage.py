@@ -2,6 +2,8 @@
 from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+SUPPORTED_SCHEMA_REVISION = "0003"
+
 
 class Base(DeclarativeBase):
     pass

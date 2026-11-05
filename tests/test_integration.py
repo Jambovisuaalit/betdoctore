@@ -50,7 +50,9 @@ def test_database_snapshot_api(tmp_path, monkeypatch):
     url = os.environ.get("DATABASE_URL", f"sqlite:///{tmp_path}/integration.db")
     monkeypatch.setenv("DATABASE_URL", url)
     engine = create_engine(url)
-    Base.metadata.create_all(engine)
+    from alembic import command
+    from alembic.config import Config
+    command.upgrade(Config("alembic.ini"), "head")
     games, _ = dataset()
     with Session(engine) as session:
         report = ingest(session, [g.model_dump(mode="json") for g in games], "game")

@@ -29,7 +29,9 @@ uvicorn betdoctore.api:app --host 127.0.0.1
 `GET /health`, `/ready`, `/snapshots/{game_id}` and `/analysis/{game_id}` are read-only.
 API analysis requires persisted snapshots and registered models. Keep the service on a trusted
 network; authentication, public ingress and operational monitoring are deployment responsibilities.
-The health endpoint does not imply database or production readiness. `/ready` checks schema access.
+The health endpoint does not imply database or production readiness. `/ready` requires the
+supported Alembic revision (currently 0003) and queryable mapped columns in all application tables.
+A healthy database response does not approve data coverage or the prediction model.
 
 For Docker, set `POSTGRES_PASSWORD`, then `docker compose up --build`. The migration service runs
 before API startup. Stop with `docker compose down`; retain the named database volume. Back up
@@ -42,7 +44,10 @@ without a backup and reviewed data-loss plan.
 with UTC offsets. A game contains final points, possessions for each team, overtime periods,
 actual tipoff/completion timestamps, team identifiers and a stable game identifier. Team identifiers
 must be canonical across all sources. Odds carry decimal prices, exact line, bookmaker, full-game
-settlement rules, source ID and timestamps. Both include `synthetic` (default false).
+settlement rules, source ID and timestamps. `includes_overtime` is mandatory: missing, null or
+unknown rules are rejected during import. Obtain the value from the authorized source contract;
+do not fill missing values with an assumed rule. Explicit false is retained but yields PASS for
+the full-game overtime model. Both include `synthetic` (default false).
 
 `observed_at` is when the source published/recorded the value; `available_at` is when the value was
 available to the consuming research process. Use the later actual availability when uncertain.
@@ -96,7 +101,9 @@ caps a proposed research stake at 1% of available bankroll. Configuration valida
 ## Backtesting and interpretation
 
 `--walk-forward` refits on records available at each prediction cutoff. Without it the explicitly
-provided fixed artifact is used only after its training boundary. No odds means a documented skip.
+provided fixed artifact is used only after its training boundary. Earlier targets are recorded
+as `MODEL_TRAINED_AFTER_CUTOFF` skips; later eligible targets continue. Equality at the cutoff is
+allowed. No odds means a documented skip.
 Latest eligible offer selection is deterministic before looking at results. Open stakes reserve
 bankroll; profits affect subsequent stakes only after game completion and result availability. Returns assume completed
 full-game markets; voided/cancelled bets need an explicit settlement feed and are outside the
@@ -112,15 +119,22 @@ software wiring evidence. They are not historical profitability or forecast-qual
 
 - CODE_READY: baseline implementation passes local checks; PostgreSQL/CI and container results must
   be inspected before accepting a release. Optional CatBoost is not implemented.
-- DATA_READY: BLOCKED. No licensed historical games/possessions, schedule archive, reconciled IDs,
-  or bookmaker snapshot feed was supplied or verified.
-- BACKTEST_READY: synthetic software workflow verified; real-data evaluation BLOCKED.
+- DATA_READY: PARTIAL. The technical basic-result foundation and selected archived schedules are
+  verified. Complete regular-season coverage and historical input availability remain open;
+  approved advanced statistics and real bookmaker snapshots are absent.
+- FORECAST_EVALUATION_READY: the frozen 298-game score-only assessment is reproducible on its
+  measured revision. The 300-game planning target and primary uncertainty gate remain unmet.
+  This exposed cohort is not a new independent holdout.
+- BACKTEST_READY: synthetic betting workflow verified; real-odds betting evaluation BLOCKED.
 - PRODUCTION_READY: NO. Requires historical integrity, independent calibration, reproducibility,
   real-data backtest, PostgreSQL/container verification, reviewed deployment and monitoring.
 
 Historical odds documentation: https://the-odds-api.com/historical-odds-data/ (paid archive).
 NBA source restrictions: https://www.nba.com/termsofuse and https://www.nba.com/stats/help/faq.
-No NBA.com dataset was scraped. A licensed source with suitable usage rights is needed.
+Four official NBA report representations were retained through Firecrawl for private result
+adjudication. They establish reviewed current report content, not historical T−60 availability
+or original HTTP wire-byte identity. Advanced and odds datasets still require independently
+reviewed sources and suitable usage rights. See [result adjudication](result-adjudication.md).
 
 ## Next acceptance steps
 
@@ -133,3 +147,32 @@ No NBA.com dataset was scraped. A licensed source with suitable usage rights is 
 5. Run real-data walk-forward reports with transaction/market limits and missing-data coverage;
    compare independent reruns and inspect PostgreSQL CI and Docker startup evidence.
 6. Review deployment authentication, backup restore, monitoring and alerting before release.
+
+
+## Local editable-install troubleshooting
+
+Verify installation without a `PYTHONPATH` workaround:
+
+```sh
+.venv/bin/python -c 'import betdoctore; print(betdoctore.__file__)'
+.venv/bin/betdoctore status
+```
+
+On this macOS workspace, Python skipped the editable `.pth` file because it had the
+filesystem `hidden` flag. Reinstalling alone preserved that flag. Inspect with
+`ls -lO .venv/lib/python3.12/site-packages/__editable__.betdoctore-0.1.0.pth`;
+if that specific file is marked hidden, remove its flag with
+`chflags nohidden .venv/lib/python3.12/site-packages/__editable__.betdoctore-0.1.0.pth`
+and repeat the checks in a separate command session. In this workspace the hidden flag
+returned between sessions. A local source link was therefore added at
+`.venv/lib/python3.12/site-packages/betdoctore` pointing to this repository's
+`src/betdoctore` directory. This keeps imports attached to the source without depending on
+`.pth` processing. The link is local and is not included in the distributed wheel.
+If recreating this workaround, first ensure that the target path does not already contain
+an installed package; do not overwrite it. A normal environment can use standard
+`pip install -e '.[dev]'` without this workaround. Verify imports and CLI from outside the
+repository as well. These are local filesystem repairs, not changes to Python's runtime.
+
+`betdoctore status` describes documented research milestones. It does not inspect the local
+database, execute tests, or query GitHub CI. Use `/ready` for schema readiness and retain
+dated audit evidence for data/model/release decisions.

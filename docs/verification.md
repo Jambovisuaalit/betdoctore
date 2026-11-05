@@ -83,3 +83,21 @@ wheel packaging includes both new evaluators and the protocol resource. After
 preserving the concurrently added research tools, the integrated suite passes
 221 tests and Ruff. Exact private-report replay uses the measured revision;
 the lock intentionally rejects a changed package file inventory.
+
+## Audit remediation — 2026-11-05
+
+- Ruff passed; 232 tests passed without a PYTHONPATH override. The installed-package
+  subprocess smoke test runs outside the repository and removes PYTHONPATH explicitly.
+- Missing/null/unknown overtime rules are rejected; CSV and Parquet regression tests
+  reject exports without the explicit rule. Synthetic fixtures state their rule explicitly.
+- API readiness requires supported schema revision 0003 and queryable mapped columns in
+  every application table. Missing/old/unsupported revisions and incomplete tables return 503.
+- Fixed-model backtests report pre-training-boundary targets as skips and continue with
+  eligible targets; the exact cutoff boundary is covered.
+- SQLite migration upgrade and schema-drift check, synthetic CLI HTML/JSON reporting,
+  installed CLI status and dependency integrity passed after these changes.
+- The local editable .pth file was repeatedly marked hidden. A local source-package
+  symlink repairs imports across command sessions; see operations troubleshooting.
+- PostgreSQL, Docker and GitHub CI for this remediation revision were not run locally.
+  Production readiness remains blocked. Frozen historical predictions and results were
+  not modified; exact historical replay continues to require its measured revision.

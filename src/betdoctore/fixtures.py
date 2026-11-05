@@ -18,5 +18,5 @@ def dataset(count: int = 20):
         odds.append(Odds(source="synthetic", source_id=f"o{i}", game_id=f"g{i}",
                          observed_at=tip-timedelta(minutes=90),
                          available_at=tip-timedelta(minutes=89), synthetic=True,
-                         bookmaker="pinnacle", line=220.5, over=1.91, under=1.91))
+                         includes_overtime=True, bookmaker="pinnacle", line=220.5, over=1.91, under=1.91))
     return games, odds

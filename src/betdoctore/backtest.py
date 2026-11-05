@@ -11,6 +11,8 @@ from .engine import Model, Settings, decision, features
 
 def run(games: list[Game], odds: list[Odds], model: Model, settings: Settings,
         walk_forward: bool = False) -> dict:
+    if not walk_forward and model.trained_until.utcoffset() is None:
+        raise ValueError("Aware training boundary required")
     ids = [g.game_id for g in games]
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate game identities")
@@ -30,6 +32,9 @@ def run(games: list[Game], odds: list[Odds], model: Model, settings: Settings,
     for game in sorted(games, key=lambda g: (g.tipoff, g.game_id)):
         cutoff = game.tipoff - timedelta(minutes=60)
         settle(cutoff)
+        if not walk_forward and model.trained_until > cutoff:
+            skipped.append({"game_id": game.game_id, "reason": "MODEL_TRAINED_AFTER_CUTOFF"})
+            continue
         if walk_forward:
             from .training import fit
             try:
